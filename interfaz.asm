@@ -71,3 +71,25 @@ mov rax,60
 mov rdi,0
 _tercera:        syscall        ;Llamar al sistema
 	;fin del programa
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+
+;
+;
