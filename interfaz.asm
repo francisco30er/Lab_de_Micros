@@ -81,10 +81,7 @@ _tercera:        syscall        ;Llamar al sistema
 ;
 ;
 ;
-;
-;
-;
-;
+;asdjhfbaksjdf
 ;
 ;
 ;
