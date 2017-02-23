@@ -6,12 +6,18 @@ addi
 jr 
 
 
-
+;configurar cuenta
 git config --global user.name "francisco30er"
 git config --global user.email	"francisco30er@gmail.com"
 git init 
 git remote add origin http://github.com/username/nombrerepertorio.git
+
+
+; para subir los archicos a github
 git add .
 git commit -m 'descripcion'
 git push origin master 
+
+;descargar los archivos que hay en git
+git clone http://github.com/username/nombrerepertorio.git
 
