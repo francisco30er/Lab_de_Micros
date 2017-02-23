@@ -19,5 +19,5 @@ git commit -m 'descripcion'
 git push origin master 
 
 ;descargar los archivos que hay en git
-git clone http://github.com/username/nombrerepertorio.git
+git clone http://github.com/francisco30er/nombrerepertorio.git
 
