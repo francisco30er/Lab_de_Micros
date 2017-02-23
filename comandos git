@@ -22,5 +22,12 @@ git push origin master
 git clone http://github.com/francisco30er/nombrerepertorio.git
 
 
-git pull origin YOUR_BRANCH_NAME 
-; Grabs online updates and merges them with your local work
+;para ver las URLs ingresadas
+git remote -v
+
+;borrar archivo
+git rm archivo1.txt
+
+
+
+
