@@ -7,10 +7,10 @@ jr
 
 
 ;configurar cuenta
-git config --global user.name "francisco30er"
-git config --global user.email	"francisco30er@gmail.com"
+git config --global user.name "username"
+git config --global user.email	"email"
 git init 
-git remote add origin http://github.com/username/nombrerepertorio.git
+git remote add origin http://github.com/francisco30er/Lab_de_Micros.git
 
 
 ; para subir los archicos a github
@@ -21,3 +21,6 @@ git push origin master
 ;descargar los archivos que hay en git
 git clone http://github.com/francisco30er/nombrerepertorio.git
 
+
+git pull origin YOUR_BRANCH_NAME 
+; Grabs online updates and merges them with your local work
