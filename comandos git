@@ -21,9 +21,3 @@ git remote -v
 
 ;borrar archivo
 git rm archivo1.txt
-
-
-
-
-
-
