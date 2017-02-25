@@ -1,9 +1,3 @@
-procesar argumentos 
-tener simulado el pc  
-codificar instrucciones
-add
-addi 
-jr 
 
 
 ;configurar cuenta
@@ -27,7 +21,6 @@ git remote -v
 
 ;borrar archivo
 git rm archivo1.txt
-
 
 
 
