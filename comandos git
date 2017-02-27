@@ -23,4 +23,8 @@ git remote -v
 git rm archivo1.txt
 
 
+git fetch origin master    ;recupera el trabajo realizado por otras personas
+
+git pull origin master
+
 
