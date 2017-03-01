@@ -7,27 +7,15 @@ section .data
 	cons_Nbeq: db 'Nbeq', 0xa	
 	cons_exit: db 'Exit', 0xa	
 
-	cons_tam: equ $-cons_beq
-	cons_ntam: equ $-cons_Nbeq
-	cons_tame: equ $-cons_exit
-
-
-
 ; Banco de registros de MIPS --------------------------------------
 	$zero DQ 0h
 	$at DQ	0h
-
-	
 	$v0 DQ 000000000000000Eh
 	$v1 DQ 000000000000000Fh
-
-
 	$a0 DQ 000000000000000Ah
 	$a1 DQ 000000000000000Bh
 	$a2 DQ 000000000000000Ch
 	$a3 DQ 000000000000000Dh
-
-
 	$t0 DQ 0000000000000001h; No estoy seguro de que se deban 
 	$t1 DQ 0000000000000001h; implementar
 	$t2 DQ 0000000000000001h
@@ -36,8 +24,6 @@ section .data
 	$t5 DQ 0000000000000001h	
 	$t6 DQ 0000000000000001h
 	$t7 DQ 0000000000000001h
-
-
 	$s0 DQ 0000000000000001h ; iniciados en valores random por prueba
 	$s1 DQ 0000000000000002h ; los solicitados segun la guia
 	$s2 DQ 0000000000000002h
@@ -46,12 +32,8 @@ section .data
 	$s5 DQ 0000000000000006h
 	$s6 DQ 0000000000000007h
 	$s7 DQ 0000000000000008h
-	
-
 	$t8 DQ 0000000000000001h
 	$t9 DQ 0000000000000001h
-
-
 	$sp DQ 000000007ffffffch ;------- stackpointer
 
 
@@ -133,23 +115,17 @@ _brake2:
 	mov r12, 0xFFFF 	;==========================PC
 	je _beqCumplido
 	jne _beqNoCumplido
-_brakej:
-	jmp _exit
+_brakej: jmp _exit
 
 _beqNoCumplido:
 	mov rax, 0x8
 	add r12, rax ; pc+8
-
-
 	mov rax, 1
 	mov rdi, 1
 	mov rsi, cons_Nbeq 
-	mov rdx, cons_ntam
+	mov rdx, 4
 	syscall
-	mov rax, 60
-	mov rdi, 0
-	syscall
-	jmp _brakej
+	jmp _exit
 
 _beqCumplido:
 	mov r9, 0x000000000000FFFF
@@ -157,23 +133,18 @@ _beqCumplido:
 	shl r9, 3 ; Corrimiento a 3 para sumar con PC (!REVISAR!)
 	add r12, 0x8 ; PC+8
 	add r12, r9 ; (PC+8)+inmediate
-_prueba1:
-	mov rax, 1
+_prueba1: mov rax, 1
 	mov rdi, 1
 	mov rsi, cons_beq 
-	mov rdx, cons_tam
+	mov rdx, 3
 	syscall	
-	mov rax, 60
-	mov rdi, 0
-	syscall
-	jmp _brakej
+	jmp _exit
 
 _exit: 	
-_prueba:
 	mov rax, 1
 	mov rdi, 1
 	mov rsi, cons_exit 
-	mov rdx, cons_tame
+	mov rdx, 4
 	syscall	
 	mov rax, 60
 	mov rdi, 0
