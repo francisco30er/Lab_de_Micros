@@ -1,15 +1,17 @@
 section .data
 
-R0 DQ 0x0000000000000010
-R1 DQ 0x0000000000000010
-R2 DQ 0x0000000000000000
+R0 DQ 0x0000000000000000
+R1 DQ 0x0000000000000001
+R2 DQ 0x0000000000000001
+R3 DQ 0x0000000000000000
 
+Ix DQ 0xffffffff00000000
 I1 DQ 0xffffffff00000000
 I2 DQ 0xffffffff00000000
 I3 DQ 0xffffffff00000000
 
 
-file db "archivo4.txt"
+file db "archivo5.txt"
 
 
 section .bss
@@ -86,214 +88,103 @@ check_null:
 	inc rax
 	jmp Loop
 	
-
 Mascara:
-	mov r8, I1
-	add r8, r15
+
+	mov r15, I1
+	
 Begin:
-	mov r9, [r8]
-	mov r10, 0xFC000000
-	and r10, r9
+	mov r8, 0xfc000000
+	and r8, [r15]
+	sar r8, 26; OPCODE
+	
+	mov r13, 0x0
+	cmp r8, r13
+	je Function
 
-	mov r9, 0x0
-	cmp r10, r9
-	je check_function
-
-
-	mov r9, 0x20000000
-	cmp r10, r9
-	;je Addi
-
-	mov r9, 0x24000000
-        cmp r10, r9
-        ;je Addu
-
-	mov r9, 0x30000000
-        cmp r10, r9
-        ;je Andi
-
-	mov r9, 0x10000000
-        cmp r10, r9
-        ;je Be
-
-	mov r9, 0x14000000
-        cmp r10, r9
-        ;je Bne
-
-	mov r9, 0x08000000
-        cmp r10, r9
-        ;je J
-
-	mov r9, 0x0c000000
-        cmp r10, r9
-        ;je Jal
-
-	mov r9, 0x8c000000
-        cmp r10, r9
-        ;je Lw
-
-	mov r9, 0x34000000
-        cmp r10, r9
-        ;je Ori
-
-	mov r9, 0x28000000
-        cmp r10, r9
-        ;je Slti
-
-	mov r9, 0x2c000000
-        cmp r10, r9
-        ;je Sltiu
-
-	mov r9, 0xac000000
-	cmp r10, r9
-	;je Sw
-
-	;add r8, 8
+	
 	jmp Exit
+	
 
-check_function:
-	mov r9, [r8]
-	mov r10, 0x3F
-	and r10, r9
+Function:
+	;RD
+	mov r8,0xf800
+	and r8, [r15]
+	sar r8, 11
+	mov rax, 0x8
+	mul r8
+	mov r8, R0
+	add r8, rax
+	mov r8, [r8]
 
-	mov r9, 0x20
-	cmp r10, r9
-	;je Add
+	;RT
+	mov r9,0x1f0000
+	and r9, [r15]
+	sar r9, 16
+	mov rax, 0x8
+	mul r9
+	mov r9, R0
+	add r9, rax
+	mov r9, [r9]
 
-	mov r9, 0x24
-	cmp r10, r9
-	;je And
+	;RS
+	mov r10,0x3e00000
+	and r10, [r15]
+	sar r10, 21
+	mov rax, 0x8
+	mul r10
+	mov r10, R0
+	add r10, rax
 
-	mov r9, 0x08
-	cmp r10, r9
-	;je Jr
+	;Function
+	mov r12, 0x3f
+	and r12, [r15]
 
-	mov r9, 0x27
-	cmp r10, r9
-	;je Nor
+	;ADD
+	mov r13, 0x20
+	cmp r12, r13
+	je Add
 
-	mov r9, 0x25
-	cmp r10, r9
-	;je Or
-
-	mov r9, 0x2a
-	cmp r10, r9
-	;je Slt
-
-	mov r9, 0x2b
-	cmp r10, r9
-	;je Sltu
-
-	mov r9, 0x00
-	cmp r10, r9
+	;SLL
+	mov r13, 0x00
+	cmp r12, r13
 	je Sll
 
-	mov r9, 0x02
-	cmp r10, r9
-	je Srl
 
-	mov r9, 0x22
-	cmp r10, r9
-	;je Sub
-
-	mov r9, 0x23
-	cmp r10, r9
-	;je Subu
-
-	mov r9, 0x18
-	cmp r10, r9
-	;je Mult
-
-	;jmp Error
 	jmp Exit
 
+Add:
+	add r8, r9
+	mov [r10], r8
+	add r15, 0x8
+	jmp Begin
 
 Sll:
-	;REGISTRO RD
-	mov r8, [I1]; CARGA LA INSTRUCCION
-	mov r9, 0xf800; MASCARA PARA RD
-	and r8, r9; MASCARA
-	sar r8, 11; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DEL REGISTRO
-	mov rax, 0x8; PARA MOVERSE EN MEMORIA DEBE SER DE OCHO EN OCHO
-	mul r8; SE MULTIPLICA EL NUMERO DE REGISTRO POR OCHO, EL RESULTADO SE GUARDA EN RAX
-	mov r9, R0; SE CARGA LA DIRECCION DEL REGISTRO BASE EN MEMORIA
-	add r9, rax; SE LE SUMA EL OFFSET
-
-	;REGISTRO RT
-	mov r8, [I1]; CARGA LA INSTRUCCION
-        mov r10, 0x1f0000; MASCARA PARA RT
-        and r8, r10; MASCARA
-        sar r8, 16; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DEL REGISTRO
-        mov rax, 0x8; PARA MOVERSE EN MEMORIA DEBE SER DE OCHO EN OCHO
-        mul r8; SE MULTIPLICA EL NUMERO DE REGISTRO POR OCHO, EL RESULTADO SE GUARDA EN RAX
-        mov r10, R0; SE CARGA LA DIRECCION DEL REGISTRO BASE EN MEMORIA
-        add r10, rax; SE LE SUMA EL OFFSET
-	mov r10, [r10]
-
 	;SHAMT
-	mov r8, [I1]; CARGA LA INSTRUCCION
-        mov r11, 0x7c0; MASCARA PARA SHAMT
-        and r8, r11; MASCARA
-        sar r8, 6; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DE CORRIMIENTO
+        mov r11, [r15];
+        mov r13, 0x7c0;
+        and r11, r13; MASCARA
+        sar r11, 6; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DE CORRIMIENTO
 Loop_sll:
-	cmp r8, 0x0
-	jz Out_sll
-	sal r10, 1
-	dec r8
-	jmp Loop_sll
+        cmp r11, 0x0
+        jz Out_sll
+	sal r9, 1
+        dec r11
+        jmp Loop_sll
 Out_sll:
-	mov [r9], r10
+        mov [r10], r9
 	add r15, 0x8
-	jmp Mascara
+	jmp Begin
 
-Srl:
-	;REGISTRO RD
-	mov r8, [I1]; CARGA LA INSTRUCCION
-	mov r9, 0xf800; MASCARA PARA RD
-	and r8, r9; MASCARA
-	sar r8, 11; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DEL REGISTRO
-	mov rax, 0x8; PARA MOVERSE EN MEMORIA DEBE SER DE OCHO EN OCHO
-	mul r8; SE MULTIPLICA EL NUMERO DE REGISTRO POR OCHO, EL RESULTADO SE GUARDA EN RAX
-	mov r9, R0; SE CARGA LA DIRECCION DEL REGISTRO BASE EN MEMORIA
-	add r9, rax; SE LE SUMA EL OFFSET
-
-	;REGISTRO RT
-	mov r8, [I1]; CARGA LA INSTRUCCION
-        mov r10, 0x1f0000; MASCARA PARA RT
-        and r8, r10; MASCARA
-        sar r8, 16; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DEL REGISTRO
-        mov rax, 0x8; PARA MOVERSE EN MEMORIA DEBE SER DE OCHO EN OCHO
-        mul r8; SE MULTIPLICA EL NUMERO DE REGISTRO POR OCHO, EL RESULTADO SE GUARDA EN RAX
-        mov r10, R0; SE CARGA LA DIRECCION DEL REGISTRO BASE EN MEMORIA
-        add r10, rax; SE LE SUMA EL OFFSET
-	mov r10, [r10]
-
-	;SHAMT
-	mov r8, [I1]; CARGA LA INSTRUCCION
-        mov r11, 0x7c0; MASCARA PARA SHAMT
-        and r8, r11; MASCARA
-        sar r8, 6; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DE CORRIMIENTO
-Loop_srl:
-	cmp r8, 0x0
-	jz Out_srl
-	shr r10, 1
-	dec r8
-	jmp Loop_srl
-Out_srl:
-	mov [r9], r10
-	add r15, 0x8
-	jmp Mascara
 
 Exit:
 	mov r8, [R0]
 	mov r9, [R1]
 	mov r10, [R2]
-	mov r11, [I1]
-	mov r12, [I2]
-	mov r13, [I3]
-
+	mov r11, [R3]
+	mov r12, [I1]
+	mov r13, [I2]
 C:
 	mov rax, 60
 	mov rdi, 0
 	syscall
-	
+
