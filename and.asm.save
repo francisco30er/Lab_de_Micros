@@ -1,20 +1,4 @@
 
-section .data
-
-I1 DQ 0xffffffff00221820; EN ESTOS DATOS SE SIMULA QUE EL REGISTRO RD ES EL NUMERO DOS ...0001 0000 0001 0001,
-R0 DQ 0x0000000000000000
-R1 DQ 0xfffffffffffffffd
-R2 DQ 0x0000000000000004
-R3 DQ 0X0000000000000000
-file db "archivo4.txt"
-
-
-section .bss
-
-text resb 100
-
-section .text
-
 global _start
 
 _start:
@@ -43,8 +27,7 @@ Add:
 	;REGISTRO RT
 	mov r8, [I1]; CARGA LA INSTRUCCION
         mov r10, 0x1f0000; MASCARA PARA RT
-        and r8, r10; MASCARA
-        sar r8, 16; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DEL REGISTRO
+        and r8, r10; MASCARA        sar r8, 16; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DEL REGISTRO
 
         mov rax, 0x8; PARA MOVERSE EN MEMORIA DEBE SER DE OCHO EN OCHO
         mul r8; SE MULTIPLICA EL NUMERO DE REGISTRO POR OCHO, EL RESULTADO SE GUARDA EN RAX
@@ -70,9 +53,9 @@ Add:
 
 	;OPERACION DE SUMA
 	mov r8,0x0;LIMPIA EL REGISTRO R8
-	add r14,r13
-	mov [r9],r14
-	mov r9, [r9]
+	add r8,r14
+	add r8,r13
+	mov [r9],r8
 
 
 Exit:

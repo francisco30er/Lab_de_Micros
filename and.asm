@@ -1,11 +1,12 @@
 
+
 section .data
 
 I1 DQ 0xffffffff00221820; EN ESTOS DATOS SE SIMULA QUE EL REGISTRO RD ES EL NUMERO DOS ...0001 0000 0001 0001,
 R0 DQ 0x0000000000000000
-R1 DQ 0xfffffffffffffffd
-R2 DQ 0x0000000000000004
-R3 DQ 0X0000000000000000
+R1 DQ 0x0000000000000001
+R2 DQ 0x0000000000000010
+R3 DQ 0X0000000000000100
 file db "archivo4.txt"
 
 
@@ -17,15 +18,10 @@ section .text
 
 global _start
 
-_start:
-	mov r8, [I1]
-	mov r9, 0x3f
-	and r8, r9
-	cmp r8,0x20
-	je Add
+
 	
 
-Add:
+And:
 
 	;REGISTRO RD
 	mov r8, [I1]; CARGA LA INSTRUCCION
@@ -70,9 +66,8 @@ Add:
 
 	;OPERACION DE SUMA
 	mov r8,0x0;LIMPIA EL REGISTRO R8
-	add r14,r13
-	mov [r9],r14
-	mov r9, [r9]
+	and r14,r13
+	mov [r14],r8
 
 
 Exit:
