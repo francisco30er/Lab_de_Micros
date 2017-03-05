@@ -193,7 +193,7 @@ prueba:	jg _systemFault
 	add r14, rax
 prueba1:
 	cmp r12, r14 ; Si pc es mayor al limite del banco
-	jg _systemFault
+	jge _systemFault
 	jmp _exit	;No se encontro address invalida
 	
 	
