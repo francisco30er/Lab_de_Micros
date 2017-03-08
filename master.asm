@@ -12,6 +12,34 @@ e3_tamano: equ $-error_tres
 error_cuatro: db 'La instruccion contiene un registro invalido', 0xa
 e4_tamano: equ $-error_cuatro
 
+linea_uno: db 'APRETE ENTER'
+l1_tamano: equ $-linea_uno
+
+bienvenida: db 'EL4313-Lab. Estructura de Microprocesadores - 1S-2017', 0xa
+bienvenida_tamano: equ $-bienvenida
+
+buscando: db 'Buscando ROM.txt', 0xa
+buscando_tamano: equ $-buscando
+
+encontrado: db 'Archivo ROM.txt encontrado', 0xa
+encontrado_tamano: equ $-encontrado
+
+no_encontrado: db 'Archivo ROM.txt no encontrado', 0xa
+no_encontrado_tamano: equ $-no_encontrado
+
+exitosa: db 'Ejecucion Exitosa', 0xa
+exitosa_tamano: equ $-exitosa
+
+fallida: db 'Ejecucion Fallida', 0xa
+fallida_tamano: equ $-fallida
+
+finalizar: db 'Presione Enter para finalizar'
+finalizar_tamano: equ $-finalizar
+
+nombres: db 'Randall Duran 2013, Francisco Elizondo 2013, Freddy Salazar 2013116449, Eduardo Zuniga 2013',0xa
+nombres_tamano: equ $-nombres
+
+
 Re0 DQ 0x0000000000000000
 Re1 DQ 0x0000000000000001
 Re2 DQ 0x0000000000000001
@@ -204,12 +232,29 @@ file db "archivo5.txt"
 section .bss
 
 text resb 300
+letra resb 1
 
 section .text
 
 global _start
 
 _start:
+
+First:
+	mov rax,1
+	mov rdi,1
+	mov rsi,bienvenida
+	mov rdx,bienvenida_tamano
+	syscall
+
+	mov rax,1
+	mov rdi,1
+	mov rsi,buscando
+	mov rdx,buscando_tamano
+	syscall
+
+
+
 	;OPEN FILE
 	mov rax, 2
 	mov rdi, file
@@ -281,15 +326,45 @@ check_null:
         je Mascara
 	inc rax
 	jmp Loop
-	
+
+
 ;CARGA LA PRIMERIA INSTRUCCION
 Mascara:
 	mov r15, I0
+	inc r14
+	mov rcx, 0x0
 Begin:
 	mov r8, 0xfc000000
 	and r8, [r15]
 	sar r8, 26; OPCODE
 	
+	inc rcx
+	dec r14
+	mov rax, 0x0
+	cmp r14, rax
+	je Pexito
+
+
+	;PRINT DATOS
+	;***************************
+	mov rax,1
+	mov rdi,1
+	mov rsi,linea_uno
+	mov rdx,l1_tamano
+	syscall
+	
+	mov rax, 0
+	mov rdi, 0
+	mov rsi, letra
+	mov rdx, 1 
+	syscall
+
+	mov rax, 0xa
+	mov rbx, [letra]
+	cmp rax, rbx
+	jne Begin
+	;***************************
+
 	mov r13, 0x0; OPCODE CERO (INSTRUCCION TIPO R)
 	cmp r8, r13
 	je Function
@@ -741,7 +816,7 @@ Error_address:
 	mov rsi,error_tres
 	mov rdx,e3_tamano
 	syscall
-	jmp Exit
+	jmp Perror
 
 Error_registro:
 	;ERROR DE REGISTRO
@@ -750,7 +825,50 @@ Error_registro:
 	mov rsi,error_cuatro
 	mov rdx,e4_tamano
 	syscall
+	jmp Perror
+
+Perror:
+	mov rax,1
+	mov rdi,1
+	mov rsi,fallida
+	mov rdx,fallida_tamano
+	syscall
+	jmp Exit
+
+
+Pexito:
+	mov rax,1
+	mov rdi,1
+	mov rsi,exitosa
+	mov rdx,exitosa_tamano
+	syscall
+	jmp Exit
+
 Exit:
+	mov rax,1
+	mov rdi,1
+	mov rsi,finalizar
+	mov rdx,finalizar_tamano
+	syscall
+	
+	mov rax, 0
+	mov rdi, 0
+	mov rsi, letra
+	mov rdx, 1 
+	syscall
+
+	mov rax, 0xa
+	mov rbx, [letra]
+	cmp rax, rbx
+	jne Exit
+
+	mov rax,1
+	mov rdi,1
+	mov rsi,nombres
+	mov rdx,nombres_tamano
+	syscall
+
+	
 	mov r8, [Re0]
 	mov r9, [Re1]
 	mov r10, [Re2]
