@@ -39,6 +39,11 @@ finalizar_tamano: equ $-finalizar
 nombres: db 'Randall Duran 2013, Francisco Elizondo 2013, Freddy Salazar 2013116449, Eduardo Zuniga 2013',0xa
 nombres_tamano: equ $-nombres
 
+registros: db '$zero ,$at ,$v0 ,$v1 ,$a0 ,$a1 ,$a2 ,$a3 ,$t0 ,$t1 ,$t2 ,$t3 ,$t4 ,$t5 ,$t6 ,$t7 ,$s0 ,$s1 ,$s2 ,$s3 ,$s4 ,$s5 ,$s6 ,$s7 ,$t8 ,$t9 ,$k0 ,$k1 ,$gp ,$sp ,$fp ,$ra '
+registros_tamano: equ $-registros
+
+asteriscos: db '*******************************', 0xa
+asteriscos_tamano: equ $-asteriscos
 
 Re0 DQ 0x0000000000000000
 Re1 DQ 0x0000000000000001
@@ -233,6 +238,8 @@ section .bss
 
 text resb 300
 letra resb 1
+digitSpace resb 100
+digitSpacePos resb 8
 
 section .text
 
@@ -330,6 +337,37 @@ check_null:
 
 ;CARGA LA PRIMERIA INSTRUCCION
 Mascara:
+	mov r8, 0xffffffff00000000
+	mov r9, [I0]
+	cmp r8, r9
+	je No_encontrado
+
+
+	;ROM ENCONTRADO
+	mov rax,1
+	mov rdi,1
+	mov rsi,encontrado
+	mov rdx,encontrado_tamano
+	syscall
+
+	;PRESIONE ENTER
+	mov rax,1
+	mov rdi,1
+	mov rsi,linea_uno
+	mov rdx,l1_tamano
+	syscall
+	
+	mov rax, 0
+	mov rdi, 0
+	mov rsi, letra
+	mov rdx, 1 
+	syscall
+
+	mov rax, 0xa
+	mov rbx, [letra]
+	cmp rax, rbx
+	jne Mascara
+
 	mov r15, I0
 	inc r14
 	mov rcx, 0x0
@@ -349,20 +387,17 @@ Begin:
 	;***************************
 	mov rax,1
 	mov rdi,1
-	mov rsi,linea_uno
-	mov rdx,l1_tamano
-	syscall
-	
-	mov rax, 0
-	mov rdi, 0
-	mov rsi, letra
-	mov rdx, 1 
+	mov rsi,asteriscos
+	mov rdx,asteriscos_tamano
 	syscall
 
-	mov rax, 0xa
-	mov rbx, [letra]
-	cmp rax, rbx
-	jne Begin
+	call datos
+
+	mov rax,1
+	mov rdi,1
+	mov rsi,asteriscos
+	mov rdx,asteriscos_tamano
+	syscall
 	;***************************
 
 	mov r13, 0x0; OPCODE CERO (INSTRUCCION TIPO R)
@@ -441,6 +476,15 @@ Begin:
 	cmp r8, r13
 	je Jump
 
+	;LOADWORD
+	mov r13, 0x23
+	cmp r8, r13
+	je Lw
+
+	;ORI
+	mov r13, 0xd
+	cmp r8, r13
+
 	;SLTI
 	mov r13, 0xa
 	cmp r8, r13
@@ -451,6 +495,10 @@ Begin:
 	cmp r8, r13
 	je Sltiu
 	
+	;STOREWORD
+	mov r13, 0x2b
+	cmp r8, r13
+	je Sw
 
 	;ERROR DE OPCODE
 	mov rax,1
@@ -542,6 +590,11 @@ Function:
 	mov r13, 0x24
 	cmp r12, r13
 	je And
+
+	;JUMP REGISTERS
+	mov r13, 0x08
+	cmp r12, r13
+	je JumpRegister
 
 	;NOR
 	mov r13, 0x27
@@ -675,7 +728,33 @@ Jump:
 	add r8, r9
 	cmp r11, r8
 	jge Error_address
+	mov r9, I0
+	cmp r9, r11
+	jg Error_address
 	mov r15, r11
+	jmp Begin
+
+JumpRegister:
+	mov r8, I0
+	mov r9, 0x96; 150 instrucciones
+	shl r9, 3
+	add r8, r9
+	cmp r10, r8
+	jge Error_address
+	mov r9, I0
+	cmp r9, r10
+	jg Error_address
+	mov r15, r10
+	jmp Begin
+
+Lw:
+	add r10, r11
+	mov rax, 0x8
+	mul r10
+	mov r8, I0; SE DEBE CAMBIAR I0 POR POSICION DE MEMORIA!!!!
+	add r8, rax
+	mov [r9], r8; REVISAR ESTA LINEA
+	add r15, 0x8
 	jmp Begin
 
 Nor:
@@ -687,6 +766,12 @@ Nor:
 Or:
 	or r10, r9
 	mov [r8], r10
+	add r15, 0x8
+	jmp Begin
+
+Ori:
+	or r10, r11
+	mov [r9], r10
 	add r15, 0x8
 	jmp Begin
 
@@ -802,6 +887,16 @@ Subu:
 	add r15, 0x8
 	jmp Begin
 
+Sw:
+	add r10, r11
+	mov rax, 0x8
+	mul r10
+	mov r8, I0; SE DEBE CAMBIAR I0 POR POSICION DE MEMORIA!!!!!
+	add r8, r10
+	mov r8, [r9]; REVISAR ESTA LINEA
+	add r15, 0x8
+	jmp Begin
+
 Mul:
 	mov rax, r9
 	imul r10
@@ -844,6 +939,14 @@ Pexito:
 	syscall
 	jmp Exit
 
+No_encontrado:
+	mov rax,1
+	mov rdi,1
+	mov rsi,no_encontrado
+	mov rdx,no_encontrado_tamano
+	syscall
+	jmp Perror
+
 Exit:
 	mov rax,1
 	mov rdi,1
@@ -860,7 +963,7 @@ Exit:
 	mov rax, 0xa
 	mov rbx, [letra]
 	cmp rax, rbx
-	jne Exit
+	je Exit
 
 	mov rax,1
 	mov rdi,1
@@ -880,3 +983,196 @@ C:
 	mov rdi, 0
 	syscall
 
+_printRAX:
+    mov rcx, digitSpace
+    mov rbx, 10
+    mov [rcx], rbx
+    inc rcx
+    mov [digitSpacePos], rcx
+ 
+_printRAXLoop:
+    mov rdx, 0
+    mov rbx, 10
+    div rbx
+    push rax
+    add rdx, 48
+ 
+    mov rcx, [digitSpacePos]
+    mov [rcx], dl
+    inc rcx
+    mov [digitSpacePos], rcx
+   
+    pop rax
+    cmp rax, 0
+    jne _printRAXLoop
+ 
+_printRAXLoop2:
+    mov rcx, [digitSpacePos]
+ 
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, rcx
+    mov rdx, 1
+    syscall
+ 
+    mov rcx, [digitSpacePos]
+    dec rcx
+    mov [digitSpacePos], rcx
+ 
+    cmp rcx, digitSpace
+    jge _printRAXLoop2
+ 
+    ret
+
+datos:
+	;PRINT $V0
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+12
+	mov rdx,4
+	syscall
+
+	mov rax, [Re2]
+	call _printRAX
+
+	;PRINT $V1
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+17
+	mov rdx,4
+	syscall
+
+	mov rax, [Re3]
+	call _printRAX
+
+	;PRINT $a0
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+22
+	mov rdx,4
+	syscall
+
+	mov rax, [Re4]
+	call _printRAX
+
+	;PRINT $a1
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+27
+	mov rdx,4
+	syscall
+
+	mov rax, [Re5]
+	call _printRAX
+
+	;PRINT $a2
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+32
+	mov rdx,4
+	syscall
+
+	mov rax, [Re6]
+	call _printRAX
+
+	;PRINT $a3
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+37
+	mov rdx,4
+	syscall
+
+	mov rax, [Re7]
+	call _printRAX
+
+	;PRINT $s0
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+82
+	mov rdx,4
+	syscall
+
+	mov rax, [Re16]
+	call _printRAX
+
+	;PRINT $s1
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+87
+	mov rdx,4
+	syscall
+
+	mov rax, [Re17]
+	call _printRAX
+
+	;PRINT $s2
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+92
+	mov rdx,4
+	syscall
+
+	mov rax, [Re18]
+	call _printRAX
+
+	;PRINT $s3
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+97
+	mov rdx,4
+	syscall
+
+	mov rax, [Re19]
+	call _printRAX
+
+	;PRINT $s4
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+102
+	mov rdx,4
+	syscall
+
+	mov rax, [Re20]
+	call _printRAX
+
+	;PRINT $s5
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+107
+	mov rdx,4
+	syscall
+
+	mov rax, [Re21]
+	call _printRAX
+
+	;PRINT $s6
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+112
+	mov rdx,4
+	syscall
+
+	mov rax, [Re22]
+	call _printRAX
+
+	;PRINT $s7
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+117
+	mov rdx,4
+	syscall
+
+	mov rax, [Re23]
+	call _printRAX
+
+	;PRINT $sp
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+147
+	mov rdx,4
+	syscall
+
+	mov rax, [Re29]
+	call _printRAX
+
+	ret
