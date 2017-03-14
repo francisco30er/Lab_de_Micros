@@ -36,11 +36,24 @@ fallida_tamano: equ $-fallida
 finalizar: db 'Presione Enter para finalizar'
 finalizar_tamano: equ $-finalizar
 
-errorstack: db 'El espacio de Stack es invalido o no esta disponible', 0xa
-errorstack_tamano: equ $-errorstack
+;-------------------------------------------------------------------
 
-nombres: db 'Randall Duran 2013, Francisco Elizondo 2013, Freddy Salazar 2013116449, Eduardo Zuniga 2013099951',0xa
+guion: db '-'
+
+errorstack1: db 'El espacio de Stack es invalido', 0xa
+errorstack_tamano1: equ $-errorstack1
+
+errorstack2: db 'El espacio de Stack no esta disponible', 0xa
+errorstack_tamano2: equ $-errorstack2
+
+;-------------------------------------------------------------------
+
+nombres: db 'Randall Duran 2013027110, Francisco Elizondo 2013097310, Freddy Salazar 2013116449, Eduardo Zuniga 2013099951',0xa
 nombres_tamano: equ $-nombres
+
+instruccion: db 'add ,addi ,addu ,and ,andi ,beq ,bne ,j ,jal ,jr ,lw ,nor ,or ,ori ,slt ,slti ,sltiu ,sltu ,sll ,srl ,sub ,subu ,mult ,sw '
+
+instruccion_tamano: equ $-instruccion
 
 registros: db '$zero ,$at ,$v0 ,$v1 ,$a0 ,$a1 ,$a2 ,$a3 ,$t0 ,$t1 ,$t2 ,$t3 ,$t4 ,$t5 ,$t6 ,$t7 ,$s0 ,$s1 ,$s2 ,$s3 ,$s4 ,$s5 ,$s6 ,$s7 ,$t8 ,$t9 ,$k0 ,$k1 ,$gp ,$sp ,$fp ,$ra '
 registros_tamano: equ $-registros
@@ -51,6 +64,7 @@ asteriscos_tamano: equ $-asteriscos
 rt DQ 0x0
 rd DQ 0x0
 rs DQ 0x0
+inmediate DQ 0x0
 
 
 Re0 DQ 0x0000000000000000
@@ -305,6 +319,10 @@ global _start
 
 _start:
 
+	mov rax, stack39
+	add rax, 0x-8
+	mov [Re29], rax
+
 First:
 	mov rax,1
 	mov rdi,1
@@ -317,8 +335,6 @@ First:
 	mov rsi,buscando
 	mov rdx,buscando_tamano
 	syscall
-
-
 
 	;OPEN FILE
 	mov rax, 2
@@ -428,6 +444,7 @@ Mascara:
 
 	mov r15, I0
 	inc r14
+	inc r14
 	mov rcx, 0x0
 Begin:
 	mov r8, 0xfc000000
@@ -465,6 +482,9 @@ Begin:
 	;INMEDIATE
 	mov r11, 0xFFFF
 	and r11, [r15]
+;===============================================================
+	mov [inmediate], r11
+;===============================================================
 	
 	;RT
 	mov r9,0x1f0000
@@ -480,9 +500,9 @@ Begin:
 	
 
 	;COMPRUEBA SI RT ES $ZERO
-	mov rax, Re0
-	cmp r9, rax
-	je Error_registro	
+;	mov rax, Re0
+;	cmp r9, rax
+;	je Error_registro	
 
 	;RS
 	mov r10,0x3e00000
@@ -499,22 +519,25 @@ Begin:
 	mov r10, [r10]
 
 	;VERIFICA SI LOS REGISTROS SON DE USO COMUN
-	mov rax, Re28
-	cmp r9, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r9, rax
+;	jge Error_registro
 
-	mov rax, Re28
-	cmp r13, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r13, rax
+;	jge Error_registro
 
-	mov rax, Re1
-	cmp rax, r9
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r9
+;	je Error_registro
 
-	mov rax, Re1
-	cmp rax, r13
-	je Error_registro	
+;	mov rax, Re1
+;	cmp rax, r13
+;	je Error_registro	
 
+;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+;==================================================================
+;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	;ADDI
 	mov r13, 0x8
@@ -594,9 +617,9 @@ Function:
 	add r8, rax
 
 	;VERIFICA SI RD ES $ZERO
-	mov rax, Re0
-	cmp r8, rax
-	je Error_registro
+;	mov rax, Re0
+;	cmp r8, rax
+;	je Error_registro
 
 	;RT
 	mov r9,0x1f0000
@@ -627,29 +650,29 @@ Function:
 	mov r10, [r10]
 
 	;COMPRUEBA QUE LOS REGISTROS SEAN DE USO COMUN
-	mov rax, Re1
-	cmp rax, r8
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r8
+;	je Error_registro
 
-	mov rax, Re1
-	cmp rax, r11
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r11
+;	je Error_registro
 
-	mov rax, Re1
-	cmp rax, r12
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r12
+;	je Error_registro
 
-	mov rax, Re28
-	cmp r8, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r8, rax
+;	jge Error_registro
 
-	mov rax, Re28
-	cmp r11, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r11, rax
+;	jge Error_registro
 
-	mov rax, Re28
-	cmp r12, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r12, rax
+;	jge Error_registro
 
 	;Function
 	mov r12, 0x3f
@@ -731,42 +754,227 @@ Function:
 	jmp Exit
 
 Add:
+	push r11	
+	push r10
+	push r9
+	push r8
+
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion
+	mov rdx,4
+	syscall
+
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
+;==============================================================
+;8=================================================================D
+
 Addi:
-	add r10, r11
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+5
+	mov rdx,5
+	syscall	
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+	
+	mov rax, [rs]
+	mov rbx, [rt]
+	mov rcx, 0x1D
+	cmp rax, rcx
+	jne addi1
+	cmp rbx, rcx
+	jne addi1
+	jmp stack
+addi1:	
+	mov r12, 0x0000000000008000
+	mov rax, 0x0
+	and r12, r11 ; Se hace la mascara bitSigno para 
+	cmp r12, rax
+	je _positivoAddi
+	jne _negativoAddi
+
+_negativoAddi:
+	mov r12, 0xFFFFFFFFFFFF0000
+	or r12, r11
+	add r10, r12
+	mov [r9], r10
+	add r15, 0x8
+	jmp Begin
+
+
+_positivoAddi:
+	mov r12, 0x000000000000FFFF
+	and r12, r11 ;Mascara para inmediate
+	add r10, r12
 	mov [r9], r10
 	add r15, 0x8
 	jmp Begin
 
 Addu:
+	
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+11
+	mov rdx,5
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	adcx r10,r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 And:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+17
+	mov rdx,4
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	and r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 Andi:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+22
+	mov rdx,5
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	and r10, r11
 	mov [r9], r10
 	add r15, 0x8
 	jmp Begin
 
 Beq:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+28
+	mov rdx,4
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r15, 0x8
 	cmp r9, r10
 	je Signo
 	jmp Begin
 
 Bne:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+33
+	mov rdx,4
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r15, 0x8
 	cmp r9, r10
 	jne Signo
@@ -799,6 +1007,20 @@ Negativo:
 	jmp Begin
 
 Jump:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+38
+	mov rdx,2
+	syscall
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	shl r11, 3
 	add r11, r15
 	mov r8, I0
@@ -814,6 +1036,28 @@ Jump:
 	jmp Begin
 
 JumpRegister:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+46
+	mov rdx,3
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	mov r8, I0
 	mov r9, 0x96; 150 instrucciones
 	shl r9, 3
@@ -827,6 +1071,20 @@ JumpRegister:
 	jmp Begin
 
 JumpLink:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+41
+	mov rdx,4
+	syscall
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	shl r11, 3
 	add r11, r15
 	mov r8, I0
@@ -851,6 +1109,27 @@ JumpLink:
 	jmp Begin
 
 Lw:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+50
+	mov rdx,3
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r10, r11
 	mov rax, 0x8
 	mul r10
@@ -861,24 +1140,111 @@ Lw:
 	jmp Begin
 
 Nor:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+54
+	mov rdx,4
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	or r10, r9
 	not r10
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 Or:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+59
+	mov rdx,3
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	or r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 Ori:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+63
+	mov rdx,4
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	or r10, r11
 	mov [r9], r10
 	add r15, 0x8
 	jmp Begin
 
 Sll:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+92
+	mov rdx,4
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	;SHAMT
         mov r11, [r15];
         mov r13, 0x7c0;
@@ -897,6 +1263,28 @@ Out_sll:
 
 
 Srl:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+97
+	mov rdx,4
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	;SHAMT
         mov r11, [r15];
         mov r13, 0x7c0;
@@ -914,6 +1302,28 @@ Out_srl:
 	jmp Begin
 
 Slt:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+68
+	mov rdx,3
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	cmp r10, r9
 	jg Greater
 	mov rax, 0x1
@@ -927,6 +1337,28 @@ Greater:
 	jmp Begin
 
 Sltu:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+86
+	mov rdx,5
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sal r9, 31
 	sar r9, 31
 	sal r10, 31
@@ -945,6 +1377,27 @@ Greateru:
 	
 
 Slti:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+73
+	mov rdx,5
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	cmp r10, r11
 	jg GreaterI
 	mov rax, 0x1
@@ -958,6 +1411,27 @@ GreaterI:
 	jmp Begin
 
 Sltiu:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+79
+	mov rdx,6
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sal r10, 31
 	sar r10, 31
 	sal r11, 31
@@ -975,12 +1449,56 @@ GreaterIu:
 	jmp Begin
 
 Sub:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+102
+	mov rdx,4
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sub r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 Subu:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+107
+	mov rdx,5
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sal r9, 31
 	sar r9, 31
 	sal r10, 31
@@ -991,6 +1509,27 @@ Subu:
 	jmp Begin
 
 Sw:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+119
+	mov rdx,3
+	syscall
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r10, r11
 	mov rax, 0x8
 	mul r10
@@ -1001,6 +1540,28 @@ Sw:
 	jmp Begin
 
 Mul:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+113
+	mov rdx,5
+	syscall
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	mov rax, r9
 	imul r10
 	mov [r8], rax
@@ -1057,9 +1618,9 @@ No_encontrado:
 stack:
 	mov r12, [Re29]
 	mov r10, 0x0000000000008000
-	mov rax, 0x0
+	mov r13, 0x0
 	and r10, r11 ; Se hace la mascara bitSigno para 
-	cmp r10, rax
+	cmp r10, r13
 	je _positivoStack
 	jne _negativoStack
 
@@ -1069,9 +1630,11 @@ _negativoStack:
 	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
 	add r12, r10 ; Se calcula nueva direccion
 	mov r13, stack0
+
 	cmp r13, r12 ; si la direccion stack0 es mayor a dir nueva
-	jg ErrorStack
+	jg ErrorStack1
 	mov [Re29], r12
+	add r15, 0x8
 	jmp Begin
 
 
@@ -1081,23 +1644,37 @@ _positivoStack:
 	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
 	add r12, r10 ; Se calcula nueva direccion
 	mov r13, stack39
+	add r13, 0x8
 	cmp r12, r13 ; si la direccion nueva es mayor a stack39
-	jg ErrorStack
+	jg ErrorStack2
 	mov [Re29], r12
+	add r15, 0x8
 	jmp Begin
 
 ;----------------------------------------------------------------
 
 ;----------------------------------------------------------------
 
-ErrorStack:
+ErrorStack1:
 	;ERROR DE STACK
 	mov rax,1
 	mov rdi,1
-	mov rsi,errorstack
-	mov rdx,errorstack_tamano
+	mov rsi,errorstack1
+	mov rdx,errorstack_tamano1
 	syscall
 	jmp Exit
+
+ErrorStack2:
+	;ERROR DE STACK
+	mov rax,1
+	mov rdi,1
+	mov rsi,errorstack2
+	mov rdx,errorstack_tamano2
+	syscall
+	jmp Exit
+
+
+
 
 Exit:
 	mov rax,1
@@ -1175,6 +1752,424 @@ _printRAXLoop2:
     jge _printRAXLoop2
  
     ret
+
+;777777777777777777777777777777777777777777777777777777777777777777777
+
+_inmediate:
+	mov r12, [inmediate]
+	mov r10, 0x8000
+	and r10, r12
+	mov r13, 0x0	
+	cmp r10, r13
+	je posi
+	jne nega
+
+posi:
+	mov rax, r12
+	call _printRAX
+	ret
+
+nega:
+	mov r13, 0xFFFFFFFFFFFF0000
+	or r12, r13
+	not r12
+	add r12, 0x1	
+
+	mov rax,1
+	mov rdi,1
+	mov rsi,guion
+	mov rdx,1
+	syscall
+	mov rax, r12
+	call _printRAX
+	ret
+
+
+
+
+
+	
+	
+
+;777777777777777777777777777777777777777777777777777777777777777777777
+
+
+
+_imprimirRegistro:
+
+;Registro r12 tiene el valor del rt, rd, rs
+
+	mov r13, 0x0
+	cmp r12, r13
+	je printR0
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR1
+	
+	add r13, 0x1
+	cmp r12, r13
+	je printR2
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR3
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR4
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR5
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR6
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR7
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR8
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR9
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR10
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR11
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR12
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR13
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR14
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR15
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR16
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR17
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR18
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR19
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR20
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR21
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR22
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR23
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR24
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR25
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR26
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR27
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR28
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR29
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR30
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR31
+
+
+
+;-------------------------------------------------
+;+++++++++++++++++++++++++++++++++++++++++++++++++
+
+printR0:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros ;$zero
+	mov rdx,6
+	syscall
+	ret
+
+printR1:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+7 ;$at
+	mov rdx,4
+	syscall
+	ret
+printR2:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+12 ;$v0
+	mov rdx,4
+	syscall
+	ret
+printR3:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+17 ;$v1
+	mov rdx,4
+	syscall
+	ret
+printR4:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+22 ;$a0
+	mov rdx,4
+	syscall
+	ret
+printR5:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+27 ;$a1
+	mov rdx,4
+	syscall
+	ret
+printR6:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+32 ;$a2
+	mov rdx,4
+	syscall
+	ret
+printR7:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+37 ;$a3
+	mov rdx,4
+	syscall
+	ret
+printR8:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+42
+	mov rdx,4
+	syscall
+	ret
+printR9:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+47
+	mov rdx,4
+	syscall
+	ret
+printR10:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+52
+	mov rdx,4
+	syscall
+	ret
+printR11:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+57
+	mov rdx,4
+	syscall
+	ret
+printR12:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+62
+	mov rdx,4
+	syscall
+	ret
+printR13:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+67
+	mov rdx,4
+	syscall
+	ret
+printR14:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+72
+	mov rdx,4
+	syscall
+	ret
+printR15:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+77
+	mov rdx,4
+	syscall
+	ret
+printR16:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+82
+	mov rdx,4
+	syscall
+	ret
+printR17:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+87
+	mov rdx,4
+	syscall
+	ret
+printR18:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+92
+	mov rdx,4
+	syscall
+	ret
+printR19:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+97
+	mov rdx,4
+	syscall
+	ret
+printR20:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+102
+	mov rdx,4
+	syscall
+	ret
+printR21:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+107
+	mov rdx,4
+	syscall
+	ret
+printR22:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+112
+	mov rdx,4
+	syscall
+	ret
+printR23:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+117
+	mov rdx,4
+	syscall
+	ret
+printR24:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+122
+	mov rdx,4
+	syscall
+	ret
+printR25:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+127
+	mov rdx,4
+	syscall
+	ret
+printR26:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+132
+	mov rdx,4
+	syscall
+	ret
+printR27:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+137
+	mov rdx,4
+	syscall
+	ret
+printR28:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+142
+	mov rdx,4
+	syscall
+	ret
+printR29:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+147
+	mov rdx,4
+	syscall
+	ret
+printR30:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+152
+	mov rdx,4
+	syscall
+	ret
+printR31:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+157
+	mov rdx,4
+	syscall
+	ret
+;+++++++++++++++++++++++++++++++++++++++++++++++++
+;-------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
 
 datos:
 	;PRINT $V0
