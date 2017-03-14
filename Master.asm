@@ -36,6 +36,12 @@ fallida_tamano: equ $-fallida
 finalizar: db 'Presione Enter para finalizar'
 finalizar_tamano: equ $-finalizar
 
+
+
+
+
+
+
 ;-------------------------------------------------------------------
 
 guion: db '-'
@@ -46,7 +52,20 @@ errorstack_tamano1: equ $-errorstack1
 errorstack2: db 'El espacio de Stack no esta disponible', 0xa
 errorstack_tamano2: equ $-errorstack2
 
+inst: db 'Instruccion'
+
+
+
+
 ;-------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 nombres: db 'Randall Duran 2013027110, Francisco Elizondo 2013097310, Freddy Salazar 2013116449, Eduardo Zuniga 2013099951',0xa
 nombres_tamano: equ $-nombres
@@ -65,6 +84,7 @@ rt DQ 0x0
 rd DQ 0x0
 rs DQ 0x0
 inmediate DQ 0x0
+address DQ 0x0
 
 
 Re0 DQ 0x0000000000000000
@@ -75,7 +95,7 @@ Re4 DQ 0x0000000000000010
 Re5 DQ 0x0000000000000000
 Re6 DQ 0x0000000000000000
 Re7 DQ 0x0000000000000000
-Re8 DQ 0x0000000000000001
+Re8 DQ 0x0000000000000000
 Re9 DQ 0x0000000000000001
 Re10 DQ 0x0000000000000000
 Re11 DQ 0x0000000000000010
@@ -941,6 +961,11 @@ Beq:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
 	call _inmediate
 
 	pop r8
@@ -968,6 +993,12 @@ Bne:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
 	call _inmediate
 
 	pop r8
@@ -1007,6 +1038,11 @@ Negativo:
 	jmp Begin
 
 Jump:
+
+	mov r11, [R15]
+	mov rax, 0x03FFFFFF
+	and r11, rax
+	mov [address], r11 
 	push r11	
 	push r10
 	push r9
@@ -1016,14 +1052,29 @@ Jump:
 	mov rsi, instruccion+38
 	mov rdx,2
 	syscall
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
+
+	mov rax, [address]
+	call _printRAX
+
+
+
+
 	pop r8
 	pop r9
 	pop r10
 	pop r11
 
+
+
 	shl r11, 3
-	add r11, r15
 	mov r8, I0
+	add r11, r8
+
 	mov r9, 0x96; 150 instrucciones
 	shl r9, 3
 	add r8, r9
@@ -1071,6 +1122,11 @@ JumpRegister:
 	jmp Begin
 
 JumpLink:
+		
+	mov r11, [R15]
+	mov rax, 0x03FFFFFF
+	and r11, rax
+	mov [address], r11 
 	push r11	
 	push r10
 	push r9
@@ -1080,14 +1136,25 @@ JumpLink:
 	mov rsi, instruccion+41
 	mov rdx,4
 	syscall
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
+
+	mov rax, [address]
+	call _printRAX
+
+
 	pop r8
 	pop r9
 	pop r10
 	pop r11
 
+
 	shl r11, 3
-	add r11, r15
 	mov r8, I0
+	add r11, r8
 	mov r9, 0x96; 150 instrucciones
 	shl r9, 3
 	add r8, r9
@@ -1786,8 +1853,28 @@ nega:
 
 
 
+_datosInternos:
+	mov r10, 0x8000000000000000
+	and r10, r12
+	mov r13, 0x0	
+	cmp r10, r13
+	je posi
+	jne nega
 
+posit:
+	mov rax, r12
+	call _printRAX
+	ret
 
+negat:
+	mov rax,1
+	mov rdi,1
+	mov rsi,guion
+	mov rdx,1
+	syscall
+	mov rax, r12
+	call _printRAX
+	ret	
 	
 	
 
@@ -2179,8 +2266,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re2]
-	call _printRAX
+	mov r12, [Re2]
+	call _datosInternos
 
 	;PRINT $V1
 	mov rax,1
@@ -2189,8 +2276,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re3]
-	call _printRAX
+	mov r12, [Re3]
+	call _datosInternos
 
 	;PRINT $a0
 	mov rax,1
@@ -2199,8 +2286,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re4]
-	call _printRAX
+	mov r12, [Re4]
+	call _datosInternos
 
 	;PRINT $a1
 	mov rax,1
@@ -2209,8 +2296,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re5]
-	call _printRAX
+	mov r12, [Re5]
+	call _datosInternos
 
 	;PRINT $a2
 	mov rax,1
@@ -2219,8 +2306,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re6]
-	call _printRAX
+	mov r12, [Re6]
+	call _datosInternos
 
 	;PRINT $a3
 	mov rax,1
@@ -2229,8 +2316,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re7]
-	call _printRAX
+	mov r12, [Re7]
+	call _datosInternos
 
 	;PRINT $s0
 	mov rax,1
@@ -2239,8 +2326,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re16]
-	call _printRAX
+	mov r12, [Re16]
+	call _datosInternos
 
 	;PRINT $s1
 	mov rax,1
@@ -2249,8 +2336,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re17]
-	call _printRAX
+	mov r12, [Re17]
+	call _datosInternos
 
 	;PRINT $s2
 	mov rax,1
@@ -2259,8 +2346,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re18]
-	call _printRAX
+	mov r12, [Re18]
+	call _datosInternos
 
 	;PRINT $s3
 	mov rax,1
@@ -2269,8 +2356,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re19]
-	call _printRAX
+	mov r12, [Re19]
+	call _datosInternos
 
 	;PRINT $s4
 	mov rax,1
@@ -2279,8 +2366,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re20]
-	call _printRAX
+	mov r12, [Re20]
+	call _datosInternos
 
 	;PRINT $s5
 	mov rax,1
@@ -2289,8 +2376,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re21]
-	call _printRAX
+	mov r12, [Re21]
+	call _datosInternos
 
 	;PRINT $s6
 	mov rax,1
@@ -2299,8 +2386,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re22]
-	call _printRAX
+	mov r12, [Re22]
+	call _datosInternos
 
 	;PRINT $s7
 	mov rax,1
@@ -2309,8 +2396,8 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re23]
-	call _printRAX
+	mov r12, [Re23]
+	call _datosInternos
 
 	;PRINT $sp
 	mov rax,1
@@ -2319,7 +2406,7 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re29]
-	call _printRAX
+	mov r12, [Re29]
+	call _datosInternos
 
 	ret
