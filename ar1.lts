@@ -1,0 +1,53 @@
+     1                                  extern	printf	
+     2                                  section .data
+     3 00000000 0500000000000000        	a:	dq	5	; long int a=5;
+     4 00000008 613D25702C20726178-     fmt:    dq "a=%p, rax=%p", 10, 0	; The printf format, "\n",'0'
+     5 00000011 3D2570000000000A00-
+     6 0000001A 000000000000000000-
+     7 00000023 0000000000         
+     8 00000028 0000000000000000        I1 DQ 0x0000000000000000; 
+     9                                  
+    10                                  
+    11                                  section .bss
+    12                                  
+    13                                  
+    14                                  
+    15                                  section .text
+    16                                  
+    17                                  global start
+    18                                  ;global main
+    19                                  
+    20                                  start:
+    21 00000000 58                      	pop rax
+    22                                  pop1:
+    23 00000001 58                      	pop rax
+    24                                  pop2:
+    25 00000002 58                      	pop rax
+    26                                  pop3:	
+    27                                  	
+    28                                  	;mov rax,[rbp+16]
+    29 00000003 4C8B00                  	mov r8,[rax]
+    30                                  	;mov r8,[I1]
+    31                                  	
+    32                                                 
+    33                                          		
+    34                                  ;main:				; the program label for the entry point
+    35                                   ;       ;push    rbp		; set up stack frame
+    36                                  	
+    37                                  	;mov	rax,[a]		; put "a" from store into register
+    38                                  	;add	rax,2		; a+2  add constant 2
+    39                                  	;mov	rdi,fmt		; format for printf
+    40                                  	;mov	rsi,[a]         ; first parameter for printf
+    41                                  	;mov	rdx,rax         ; second parameter for printf
+    42                                  	;mov	rax,0		; no xmm registers
+    43                                          ;call    printf		; Call C function
+    44                                  
+    45                                  	;pop	rbp		; restore stack
+    46                                  
+    47                                  	;mov	rax,0		; normal, no error, return value
+    48                                  	;ret			; return
+    49                                  
+    50                                  Exit:
+    51 00000006 B83C000000              	mov rax,60
+    52 0000000B BF00000000              	mov rdi,0
+    53 00000010 0F05                    	syscall

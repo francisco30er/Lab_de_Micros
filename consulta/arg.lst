@@ -1,0 +1,170 @@
+     1                                   extern printf                   ; the C function to be calle
+     2                                  
+     3                                  SECTION .data ; Section containing initializion
+     4                                  
+     5 00000000 7072696E7466323A20-     fmt2:   db "printf2: flt2=%e", 10, 0
+     6 00000009 666C74323D25650A00 
+     7 00000012 63686172313D25632C-     fmt3:	db "char1=%c, str1=%s, len=%d", 10, 0
+     8 0000001B 20737472313D25732C-
+     9 00000024 206C656E3D25640A00 
+    10 0000002D 63686172313D25632C-     fmt4:	db "char1=%c, str1=%s, len=%d, inta1=%d, inta2=%ld", 10, 0
+    11 00000036 20737472313D25732C-
+    12 0000003F 206C656E3D25642C20-
+    13 00000048 696E7461313D25642C-
+    14 00000051 20696E7461323D256C-
+    15 0000005A 640A00             
+    16 0000005D 686578313D256C582C-     fmt5:	db "hex1=%lX, flt1=%e, flt2=%e", 10, 0
+    17 00000066 20666C74313D25652C-
+    18 0000006F 20666C74323D25650A-
+    19 00000078 00                 
+    20                                  	
+    21 00000079 61                      char1:	db	'a'			; a character 
+    22 0000007A 6D79737472696E6700      str1:	db	"mystring",0	        ; a C string, "string" needs 0
+    23                                  len:	equ	$-str1			; len has value, not an address
+    24 00000083 4E61BC00                inta1:	dd	12345678		; integer 12345678, note dd
+    25 00000087 341CDCDF02000000        inta2:	dq	12345678900		; long integer 12345678900, note dq
+    26 0000008F CDAB896745230100        hex1:	dq	0x123456789ABCD	        ; long hex constant, note dq
+    27 00000097 BB16D80E                flt1:	dd	5.327e-30		; 32-bit floating point, note dd
+    28 0000009B 6ED768D3250BA7FE        flt2:	dq	-123.456789e300	        ; 64-bit floating point, note dq
+    29                                  
+    30 000000A3 205465726D696E6174-     ErrMsg: db " Terminated with error.",10
+    31 000000AC 656420776974682065-
+    32 000000B5 72726F722E0A       
+    33                                  ERRLEN equ $-ErrMsg
+    34                                  
+    35                                  SECTION .bss ; Section containing uninitialized data
+    36                                  
+    37                                  
+    38 00000000 <res 00000008>          flttmp:	resq 1			        ; 64-bit temporary for printing flt1
+    39                                  MAXARGS equ 10          ; Maximum # of args we support
+    40 00000008 <res 00000004>          ArgCount: resd 1        ; # of arguments passed to program
+    41 0000000C <res 00000028>          ArgPtrs: resd MAXARGS   ; Table of pointers to arguments
+    42 00000034 <res 00000028>          ArgLens: resd MAXARGS   ; Table of argument lengths
+    43                                  
+    44                                  
+    45                                  SECTION .text           ; Section containing code
+    46                                  
+    47                                  
+    48                                  global _start           ; Linker needs this to find the entry point!
+    49                                  
+    50                                  
+    51                                  global main
+    52                                  
+    53                                  
+    54                                  _start:
+    55 00000000 90                      nop                     ; This no-op keeps gdb happy...
+    56                                  ; Get the command line argument count off the stack and validate it:
+    57                                  
+    58 00000001 59                      pop rcx                    ; TOS contains the argument count
+    59 00000002 4883F90A                cmp rcx,MAXARGS            ; See if the arg count exceeds MAXARGS
+    60                                  ;ja Error                   ; If so, exit with an error message
+    61 00000006 48890C25[08000000]      mov qword [ArgCount],rcx   ; Save arg count in memory variable
+    62 0000000E 4989CA                  mov r10,rcx
+    63                                  
+    64                                  global	main		        ; "C" main program 
+    65                                  main:				        ; label, start of main program
+    66 00000011 55                      	push    rbp			; set up stack frame 
+    67 00000012 D90425[97000000]        	fld	dword [flt1]	        ; need to convert 32-bit to 64-bit
+    68 00000019 DD1C25[00000000]        	fstp	qword [flttmp]          ; floating load makes 80-bit,
+    69                                  	                                ; store as 64-bit
+    70 00000020 48BF-                   	mov	rdi,fmt2
+    71 00000022 [0000000000000000] 
+    72 0000002A F30F7E0425-             	movq	xmm0, qword [flt2]
+    73 0000002F [9B000000]         
+    74 00000033 B801000000              	mov	rax, 1			; 1 xmm register
+    75 00000038 E8(00000000)            	call	printf
+    76                                  
+    77 0000003D 48BF-                   	mov	rdi, fmt3		; first arg, format
+    78 0000003F [1200000000000000] 
+    79 00000047 488B3425[79000000]      	mov	rsi, [char1]		; second arg, char
+    80 0000004F 48BA-                   	mov	rdx, str1		; third arg, string
+    81 00000051 [7A00000000000000] 
+    82 00000059 B909000000              	mov	rcx, len		; fourth arg, int
+    83 0000005E B800000000              	mov	rax, 0			; no xmm used
+    84 00000063 E8(00000000)            	call	printf
+    85                                  
+    86 00000068 48BF-                   	mov	rdi, fmt4		; first arg, format
+    87 0000006A [2D00000000000000] 
+    88 00000072 488B3425[79000000]      	mov	rsi, [char1]		; second arg, char
+    89 0000007A 48BA-                   	mov	rdx, str1		; third arg, string
+    90 0000007C [7A00000000000000] 
+    91 00000084 B909000000              	mov	rcx, len		; fourth arg, int
+    92 00000089 4C8B0425[83000000]      	mov	r8, [inta1]		; fifth arg, inta1 32->64
+    93 00000091 4C8B0C25[87000000]      	mov	r9, [inta2]		; sixth arg, inta2
+    94 00000099 B800000000              	mov	rax, 0			; no xmm used
+    95 0000009E E8(00000000)            	call	printf
+    96                                  
+    97 000000A3 48BF-                   	mov	rdi, fmt5		; first arg, format
+    98 000000A5 [5D00000000000000] 
+    99 000000AD 488B3425[8F000000]      	mov	rsi, [hex1]		; second arg, char
+   100 000000B5 F30F7E0425-             	movq	xmm0, qword [flttmp]    ; first double
+   101 000000BA [00000000]         
+   102 000000BE F30F7E0C25-             	movq	xmm1, qword [flt2]	; second double
+   103 000000C3 [9B000000]         
+   104 000000C7 B802000000              	mov	rax, 2			; 2 xmm used
+   105 000000CC E8(00000000)            	call	printf
+   106                                  	
+   107 000000D1 5D                      	pop	rbp			; restore stack	
+   108 000000D2 B800000000                      mov     rax, 0			; exit code, 0=normal
+   109 000000D7 C3                              ret				; main returns to operating system
+   110                                  
+   111                                  
+   112                                  
+   113                                  ; Once we know how many args we have, a loop will pop them into ArgPtrs:
+   114                                  
+   115                                  
+   116                                  ;xor rdx,rdx ; Zero a loop counter
+   117                                  
+   118                                  ;SaveArgs:
+   119                                  
+   120                                  ;op qword [ArgPtrs + rdx*8]      ; Pop an arg addr into the memory table
+   121                                  ;mov r8,[ArgPtrs + rdx*8]
+   122                                  ;inc rdx				 ; Bump the counter to the next arg addr
+   123                                  ;cmp rdx,rcx			 ; Is the counter = the argument count?
+   124                                  ;jb SaveArgs			 ; If not, loop back and do another
+   125                                  
+   126                                  ; With the argument pointers stored in ArgPtrs, we calculate their lengths:
+   127                                  
+   128                                  ;xor rax,rax		 ; Searching for 0, so clear AL to 0
+   129                                  ;xor rbx,rbx		 ; Pointer table offset starts at 0
+   130                                  
+   131                                  
+   132                                  ;ScanOne:
+   133                                  ;mov rcx,0000ffffh		 ; Limit search to 65535 bytes max
+   134                                  ;mov rdi,qword [ArgPtrs+rbx*8]    ; Put address of string to search in EDI
+   135                                  ;mov rdx,rdi			 ; Copy starting address into EDX
+   136                                  ;cld				 ; Set search direction to up-memory
+   137                                  ;repne scasb			 ; Search for null (0 char) in string at edi
+   138                                  ;jnz Error			 ; REPNE SCASB ended without finding AL
+   139                                  ;mov byte [rdi-1],10		 ; Store an EOL where the null used to be
+   140                                  ;sub rdi,rdx			 ; Subtract position of 0 from start address
+   141                                  ;mov qword [ArgLens+ebx*8],rdi    ; Put length of arg into table
+   142                                  ;inc rbx			       	; Add 1 to argument counter
+   143                                  ;cmp rbx,[ArgCount]		 ; See if arg counter exceeds argument count
+   144                                  ;jb ScanOne			 ; If not, loop back and do another one
+   145                                  
+   146                                  ; Display all arguments to stdout:
+   147                                  
+   148                                  ;xor rsi,rsi		 ; Start (for table addressing reasons) at 0
+   149                                  
+   150                                  ;Showem:
+   151                                  ;mov rcx,[ArgPtrs+rsi*8]  ; Pass offset of the message
+   152                                  ;mov rax,4		 ; Specify sys_write call
+   153                                  ;mov rbx,1		 ; Specify File Descriptor 1: Standard Output
+   154                                  ;mov rdx,[ArgLens+rsi*8]  ; Pass the length of the message
+   155                                  ;int 80H			 ; Make kernel call
+   156                                  ;inc rsi			 ; Increment the argument counter
+   157                                  ;cmp rsi,[ArgCount]	 ; See if we’ve displayed all the arguments
+   158                                  ;jb Showem		 ; If not, loop back and do another
+   159                                  ;jmp Exit		 ; We’re done! Let’s pack it in!
+   160                                  
+   161                                  ;Error: mov rax,4	 ; Specify sys_write call
+   162                                  ;	mov rbx,1		 ; Specify File Descriptor 2: Standard Error
+   163                                  ;	mov rcx,ErrMsg		 ; Pass offset of the error message
+   164                                  ;	mov rdx,ERRLEN		 ; Pass the length of the message
+   165                                  ;	int 80H			 ; Make kernel call
+   166                                  
+   167                                  ;Exit:   mov rax,1	 ; Code for Exit Syscall
+   168                                  ;	mov rbx,0	 ; Return a code of zero
+   169                                  ;1	int 80H		 ; Make kernel call
+   170                                  	

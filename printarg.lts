@@ -1,0 +1,27 @@
+     1                                  extern printf, exit
+     2                                  
+     3                                  section .data
+     4 00000000 25640A00                fmtint  db  "%d", 10, 0
+     5 00000004 25730A00                fmtstr  db  "%s", 10, 0
+     6                                  
+     7                                  section .text
+     8                                  global main
+     9                                  main:
+    10                                  
+    11 00000000 FF3424                      push    qword[rsp]
+    12 00000003 68[00000000]                push    fmtint      
+    13 00000008 E8(00000000)                call    printf                      ; print argc
+    14 0000000D 4883C408                    add     rsp, 4 * 2
+    15                                  
+    16 00000011 BB01000000                  mov     rbx, 1  
+    17                                  PrintArgV:
+    18 00000016 FF34DC                      push    qword [rsp + 8 * rbx]
+    19 00000019 68[04000000]                push    fmtstr
+    20 0000001E E8(00000000)                call    printf                      ; print each param in argv
+    21 00000023 4883C408                    add     rsp, 4 * 2
+    22                                  
+    23 00000027 48FFC3                      inc     rbx
+    24 0000002A 483B1C24                    cmp     rbx, qword [rsp]
+    25 0000002E 7EE6                        jng     PrintArgV
+    26                                  
+    27 00000030 E8(00000000)                call    exit

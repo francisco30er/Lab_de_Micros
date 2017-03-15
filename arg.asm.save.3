@@ -1,0 +1,22 @@
+ 
+section .data
+    I1 DQ 0x0000000000000000
+    texta db "Argument(s): ",0
+    textb1 db "Argument #",0
+    textb2 db ": ",0
+    newline db 10,0
+ 
+section .bss
+    argc resb 8
+    argPos resb 8
+ 
+section .text
+    global _start
+ 
+_start:
+    push rbp
+    mov rbp,rsp
+    mov r8,[rbp]
+    mov r9,[rbp+16]
+
+Exit:
