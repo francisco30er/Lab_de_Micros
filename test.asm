@@ -2,25 +2,27 @@ extern system
 
 section .data
 
-info: db 'lscpu | grep Arquitectura',0xA
-infot: equ $-info
+         an: db 'system("lscpu | grep Arquitectura")', 0xA
+         format: db "num: %c" , 10, 0
 
- 
 section .text
-    global _start
-_start:
-	
-;push rax
-	push rax
-	mov rdi, rsi
-	mov rsi, rax
-	mov rsi, info	
-	mov rdx, infot
-	syscall
+         global main
+         extern printf
 
-	mov rax, 60
-	mov rdi, 0
-	syscall
+main:
+         push rbp
+         mov rbp,rsp
 
+         mov rax, [an]
+         push rax
+         push dword format
+         call printf
+
+         add rsp, 8
+         mov rsp,rbp
+         pop rbp
+
+         mov rax, 0
+         ret
 
 

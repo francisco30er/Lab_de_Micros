@@ -1,0 +1,30 @@
+     1                                  extern system
+     2                                  extern printf
+     3                                  section .data
+     4                                  
+     5 00000000 6C73637075207C2067-     info: db 'lscpu | grep Arquitectura',0xA
+     6 00000009 726570204172717569-
+     7 00000012 746563747572610A   
+     8                                  ;infot: equ $-info
+     9                                  
+    10                                   
+    11                                  section .text
+    12                                  
+    13                                  	extern main
+    14                                      global _start
+    15                                  
+    16                                  _start:
+    17                                  
+    18 00000000 50                      push rax
+    19                                  
+    20 00000001 B801000000              mov rax, 1
+    21 00000006 BF01000000              mov rdi, 1
+    22 0000000B 0F05                    syscall
+    23                                  
+    24                                  
+    25 0000000D B83C000000              	mov rax, 60
+    26 00000012 BF00000000              	mov rdi, 0
+    27 00000017 0F05                    	syscall
+    28                                  
+    29                                  
+    30                                  
