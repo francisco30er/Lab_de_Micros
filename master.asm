@@ -1,4 +1,29 @@
+%macro write_file 2
+	;OPEN FILE
+	mov rax, 2
+	mov rdi, resul
+	mov rsi, 1+1024
+	mov rdx, 0644o
+	syscall
+	
+
+	;WRITE FILE
+	push rax
+	mov rdi, rax
+	mov rax, 1
+	mov rsi, %1
+	mov rdx, %2
+	syscall
+
+	;CLOSE FILE
+	mov rax, 3
+	pop rdi
+	syscall
+%endmacro
+
 section .data
+
+
 
 error_uno: db 'La instruccion presenta un OPcode erroneo', 0xa
 e1_tamano: equ $-error_uno
@@ -36,14 +61,58 @@ fallida_tamano: equ $-fallida
 finalizar: db 'Presione Enter para finalizar'
 finalizar_tamano: equ $-finalizar
 
-nombres: db 'Randall Duran 2013, Francisco Elizondo 2013, Freddy Salazar 2013116449, Eduardo Zuniga 2013',0xa
+
+
+
+
+
+
+;-------------------------------------------------------------------
+
+guion: db '-'
+
+errorstack1: db 'El espacio de Stack es invalido', 0xa
+errorstack_tamano1: equ $-errorstack1
+
+errorstack2: db 'El espacio de Stack no esta disponible', 0xa
+errorstack_tamano2: equ $-errorstack2
+
+inst: db 'Instruccion'
+
+
+
+
+;-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+nombres: db 'Randall Duran 2013027110, Francisco Elizondo 2013097310, Freddy Salazar 2013116449, Eduardo Zuniga 2013099951',0xa
 nombres_tamano: equ $-nombres
+
+instruccion: db 'add ,addi ,addu ,and ,andi ,beq ,bne ,j ,jal ,jr ,lw ,nor ,or ,ori ,slt ,slti ,sltiu ,sltu ,sll ,srl ,sub ,subu ,mult ,sw '
+
+instruccion_tamano: equ $-instruccion
 
 registros: db '$zero ,$at ,$v0 ,$v1 ,$a0 ,$a1 ,$a2 ,$a3 ,$t0 ,$t1 ,$t2 ,$t3 ,$t4 ,$t5 ,$t6 ,$t7 ,$s0 ,$s1 ,$s2 ,$s3 ,$s4 ,$s5 ,$s6 ,$s7 ,$t8 ,$t9 ,$k0 ,$k1 ,$gp ,$sp ,$fp ,$ra '
 registros_tamano: equ $-registros
 
 asteriscos: db '*******************************', 0xa
 asteriscos_tamano: equ $-asteriscos
+
+rt DQ 0x0
+rd DQ 0x0
+rs DQ 0x0
+inmediate DQ 0x0
+address DQ 0x0
+
+resul db "resultados.txt"
+
 
 Re0 DQ 0x0000000000000000
 Re1 DQ 0x0000000000000001
@@ -53,7 +122,7 @@ Re4 DQ 0x0000000000000010
 Re5 DQ 0x0000000000000000
 Re6 DQ 0x0000000000000000
 Re7 DQ 0x0000000000000000
-Re8 DQ 0x0000000000000001
+Re8 DQ 0x0000000000000000
 Re9 DQ 0x0000000000000001
 Re10 DQ 0x0000000000000000
 Re11 DQ 0x0000000000000010
@@ -231,7 +300,57 @@ I148 DQ 0xffffffff00000000
 I149 DQ 0xffffffff00000000
 
 
+;--------------------- stack ---------------------------------------
+
+
+	Contador DQ 0x8	
+
+	stack0 DQ 9h 
+	stack1 DQ 8h
+	stack2 DQ 7h
+	stack3 DQ 6h
+	stack4 DQ 5h
+	stack5 DQ 4h
+	stack6 DQ 3h
+	stack7 DQ 2h
+	stack8 DQ 1h
+	stack9 DQ 0h
+	stack10 DQ 9h 
+	stack11 DQ 8h
+	stack12 DQ 7h
+	stack13 DQ 6h
+	stack14 DQ 5h
+	stack15 DQ 4h
+	stack16 DQ 3h
+	stack17 DQ 2h
+	stack18 DQ 1h
+	stack19 DQ 0h
+	stack20 DQ 9h 
+	stack21 DQ 8h
+	stack22 DQ 7h
+	stack23 DQ 6h
+	stack24 DQ 5h
+	stack25 DQ 4h
+	stack26 DQ 3h
+	stack27 DQ 2h
+	stack28 DQ 1h
+	stack29 DQ 0h
+	stack30 DQ 9h 
+	stack31 DQ 8h
+	stack32 DQ 7h
+	stack33 DQ 6h
+	stack34 DQ 5h
+	stack35 DQ 4h
+	stack36 DQ 3h
+	stack37 DQ 2h
+	stack38 DQ 1h
+	stack39 DQ 0h
+
+
+
+
 file db "archivo5.txt"
+
 
 
 section .bss
@@ -247,6 +366,25 @@ global _start
 
 _start:
 
+	;CREATE RESULTADOS
+	mov rax, 2
+	mov rdi, resul
+	mov rsi, 64+512
+	mov rdx, 0644o
+	syscall
+
+	;CLOSE RESULTADOS
+	push rax
+	mov rax, 3
+	pop rdi
+	syscall
+
+	mov rax, stack39
+	add rax, 0x-8
+	mov [Re29], rax
+
+	
+
 First:
 	mov rax,1
 	mov rdi,1
@@ -254,13 +392,15 @@ First:
 	mov rdx,bienvenida_tamano
 	syscall
 
+	write_file bienvenida, bienvenida_tamano
+
 	mov rax,1
 	mov rdi,1
 	mov rsi,buscando
 	mov rdx,buscando_tamano
 	syscall
-
-
+	
+	write_file buscando, buscando_tamano
 
 	;OPEN FILE
 	mov rax, 2
@@ -350,12 +490,16 @@ Mascara:
 	mov rdx,encontrado_tamano
 	syscall
 
+	write_file encontrado, encontrado_tamano
+
 	;PRESIONE ENTER
 	mov rax,1
 	mov rdi,1
 	mov rsi,linea_uno
 	mov rdx,l1_tamano
 	syscall
+
+	write_file linea_uno, l1_tamano
 	
 	mov rax, 0
 	mov rdi, 0
@@ -369,6 +513,7 @@ Mascara:
 	jne Mascara
 
 	mov r15, I0
+	inc r14
 	inc r14
 	mov rcx, 0x0
 Begin:
@@ -391,13 +536,11 @@ Begin:
 	mov rdx,asteriscos_tamano
 	syscall
 
+	write_file asteriscos, asteriscos_tamano
+
 	call datos
 
-	mov rax,1
-	mov rdi,1
-	mov rsi,asteriscos
-	mov rdx,asteriscos_tamano
-	syscall
+	
 	;***************************
 
 	mov r13, 0x0; OPCODE CERO (INSTRUCCION TIPO R)
@@ -407,25 +550,35 @@ Begin:
 	;INMEDIATE
 	mov r11, 0xFFFF
 	and r11, [r15]
+;===============================================================
+	mov [inmediate], r11
+;===============================================================
 	
 	;RT
 	mov r9,0x1f0000
 	and r9, [r15]
 	sar r9, 16
+;================================================================
+	mov [rt], r9 ; Guarda el numero de registro en memo rt	
+;================================================================
 	mov rax, 0x8
 	mul r9
 	mov r9, Re0
 	add r9, rax
+	
 
 	;COMPRUEBA SI RT ES $ZERO
-	mov rax, Re0
-	cmp r9, rax
-	je Error_registro	
+;	mov rax, Re0
+;	cmp r9, rax
+;	je Error_registro	
 
 	;RS
 	mov r10,0x3e00000
 	and r10, [r15]
 	sar r10, 21
+;=================================================================
+	mov [rs], r10 ; Guarda el numero de registro en memo rs	
+;=================================================================
 	mov rax, 0x8
 	mul r10
 	mov r10, Re0
@@ -434,22 +587,25 @@ Begin:
 	mov r10, [r10]
 
 	;VERIFICA SI LOS REGISTROS SON DE USO COMUN
-	mov rax, Re28
-	cmp r9, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r9, rax
+;	jge Error_registro
 
-	mov rax, Re28
-	cmp r13, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r13, rax
+;	jge Error_registro
 
-	mov rax, Re1
-	cmp rax, r9
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r9
+;	je Error_registro
 
-	mov rax, Re1
-	cmp rax, r13
-	je Error_registro	
+;	mov rax, Re1
+;	cmp rax, r13
+;	je Error_registro	
 
+;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+;==================================================================
+;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	;ADDI
 	mov r13, 0x8
@@ -475,6 +631,11 @@ Begin:
 	mov r13, 0x2
 	cmp r8, r13
 	je Jump
+
+	;JUMP AND LINK
+	mov r13, 0x3
+	cmp r8, r13
+	je JumpLink
 
 	;LOADWORD
 	mov r13, 0x23
@@ -515,20 +676,26 @@ Function:
 	mov r8,0xf800
 	and r8, [r15]
 	sar r8, 11
+;=================================================================	
+	mov [rd], r8
+;=================================================================
 	mov rax, 0x8
 	mul r8
 	mov r8, Re0
 	add r8, rax
 
 	;VERIFICA SI RD ES $ZERO
-	mov rax, Re0
-	cmp r8, rax
-	je Error_registro
+;	mov rax, Re0
+;	cmp r8, rax
+;	je Error_registro
 
 	;RT
 	mov r9,0x1f0000
 	and r9, [r15]
 	sar r9, 16
+;=================================================================
+	mov [rt], r9
+;=================================================================
 	mov rax, 0x8
 	mul r9
 	mov r9, Re0
@@ -540,6 +707,9 @@ Function:
 	mov r10,0x3e00000
 	and r10, [r15]
 	sar r10, 21
+;=================================================================
+	mov [rs], r10
+;=================================================================
 	mov rax, 0x8
 	mul r10
 	mov r10, Re0
@@ -548,29 +718,29 @@ Function:
 	mov r10, [r10]
 
 	;COMPRUEBA QUE LOS REGISTROS SEAN DE USO COMUN
-	mov rax, Re1
-	cmp rax, r8
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r8
+;	je Error_registro
 
-	mov rax, Re1
-	cmp rax, r11
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r11
+;	je Error_registro
 
-	mov rax, Re1
-	cmp rax, r12
-	je Error_registro
+;	mov rax, Re1
+;	cmp rax, r12
+;	je Error_registro
 
-	mov rax, Re28
-	cmp r8, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r8, rax
+;	jge Error_registro
 
-	mov rax, Re28
-	cmp r11, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r11, rax
+;	jge Error_registro
 
-	mov rax, Re28
-	cmp r12, rax
-	jge Error_registro
+;	mov rax, Re28
+;	cmp r12, rax
+;	jge Error_registro
 
 	;Function
 	mov r12, 0x3f
@@ -652,42 +822,275 @@ Function:
 	jmp Exit
 
 Add:
+	push r11	
+	push r10
+	push r9
+	push r8
+
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion
+	mov rdx,4
+	syscall
+
+	write_file instruccion, 4
+
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
+;==============================================================
+;8=================================================================D
+
 Addi:
-	add r10, r11
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+5
+	mov rdx,5
+	syscall	
+
+	push r13
+	mov r13, instruccion+5
+	write_file r13, 5
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+	
+	mov rax, [rs]
+	mov rbx, [rt]
+	mov rcx, 0x1D
+	cmp rax, rcx
+	jne addi1
+	cmp rbx, rcx
+	jne addi1
+	jmp stack
+addi1:	
+	mov r12, 0x0000000000008000
+	mov rax, 0x0
+	and r12, r11 ; Se hace la mascara bitSigno para 
+	cmp r12, rax
+	je _positivoAddi
+	jne _negativoAddi
+
+_negativoAddi:
+	mov r12, 0xFFFFFFFFFFFF0000
+	or r12, r11
+	add r10, r12
+	mov [r9], r10
+	add r15, 0x8
+	jmp Begin
+
+
+_positivoAddi:
+	mov r12, 0x000000000000FFFF
+	and r12, r11 ;Mascara para inmediate
+	add r10, r12
 	mov [r9], r10
 	add r15, 0x8
 	jmp Begin
 
 Addu:
+	
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+11
+	mov rdx,5
+	syscall
+
+	push r13
+	mov r13, instruccion+11
+	write_file r13, 5
+	pop r13	
+
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	adcx r10,r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 And:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+17
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+17
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	and r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 Andi:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+22
+	mov rdx,5
+	syscall
+
+	push r13
+	mov r13, instruccion+22
+	write_file r13, 5
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	and r10, r11
 	mov [r9], r10
 	add r15, 0x8
 	jmp Begin
 
 Beq:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+28
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+28
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r15, 0x8
 	cmp r9, r10
 	je Signo
 	jmp Begin
 
 Bne:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+33
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+33
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
+
+	write_file inst, 11
+
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r15, 0x8
 	cmp r9, r10
 	jne Signo
@@ -720,9 +1123,51 @@ Negativo:
 	jmp Begin
 
 Jump:
+
+	mov r11, [R15]
+	mov rax, 0x03FFFFFF
+	and r11, rax
+	mov [address], r11 
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+38
+	mov rdx,2
+	syscall
+
+	push r13
+	mov r13, instruccion+38
+	write_file r13, 2
+	pop r13	
+
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
+
+	write_file inst, 11
+
+	mov rax, [address]
+	call _printRAX
+
+
+
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
+
+
 	shl r11, 3
-	add r11, r15
 	mov r8, I0
+	add r11, r8
+
 	mov r9, 0x96; 150 instrucciones
 	shl r9, 3
 	add r8, r9
@@ -735,6 +1180,33 @@ Jump:
 	jmp Begin
 
 JumpRegister:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+46
+	mov rdx,3
+	syscall
+
+	push r13
+	mov r13, instruccion+46
+	write_file r13, 3
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	mov r8, I0
 	mov r9, 0x96; 150 instrucciones
 	shl r9, 3
@@ -747,7 +1219,95 @@ JumpRegister:
 	mov r15, r10
 	jmp Begin
 
+JumpLink:
+		
+	mov r11, [R15]
+	mov rax, 0x03FFFFFF
+	and r11, rax
+	mov [address], r11 
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+41
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+41
+	write_file r13, 4
+	pop r13	
+	
+	mov rax,1
+	mov rdi,1
+	mov rsi, inst
+	mov rdx,11
+	syscall
+
+	write_file inst, 11
+
+	mov rax, [address]
+	call _printRAX
+
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
+
+	shl r11, 3
+	mov r8, I0
+	add r11, r8
+	mov r9, 0x96; 150 instrucciones
+	shl r9, 3
+	add r8, r9
+	cmp r11, r8
+	jge Error_address
+	mov r9, I0
+	cmp r9, r11
+	jg Error_address
+	
+;----------------------------------------------------
+;		GUARDADO DE PC+4 EN STACK
+	mov r8, [Re29] ; Obtengo la direccion del stack pointer
+	sub r8, 0x8 ; Le resto 8 para pasar al campo que se pueda usar
+	mov r10, 0x8	
+	add r10, r15
+	mov [r8], r10
+;---------------------------------------------------
+	mov r15, r11
+	jmp Begin
+
 Lw:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+50
+	mov rdx,3
+	syscall
+
+	push r13
+	mov r13, instruccion+50
+	write_file r13, 3
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r10, r11
 	mov rax, 0x8
 	mul r10
@@ -758,24 +1318,131 @@ Lw:
 	jmp Begin
 
 Nor:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+54
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+54
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	or r10, r9
 	not r10
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 Or:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+59
+	mov rdx,3
+	syscall
+
+	push r13
+	mov r13, instruccion+59
+	write_file r13, 3
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	or r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 Ori:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+63
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+63
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	or r10, r11
 	mov [r9], r10
 	add r15, 0x8
 	jmp Begin
 
 Sll:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+92
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+92
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	;SHAMT
         mov r11, [r15];
         mov r13, 0x7c0;
@@ -794,6 +1461,33 @@ Out_sll:
 
 
 Srl:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+97
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+97
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	;SHAMT
         mov r11, [r15];
         mov r13, 0x7c0;
@@ -811,6 +1505,33 @@ Out_srl:
 	jmp Begin
 
 Slt:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+68
+	mov rdx,3
+	syscall
+
+	push r13
+	mov r13, instruccion+68
+	write_file r13, 3
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	cmp r10, r9
 	jg Greater
 	mov rax, 0x1
@@ -824,6 +1545,33 @@ Greater:
 	jmp Begin
 
 Sltu:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+86
+	mov rdx,5
+	syscall
+
+	push r13
+	mov r13, instruccion+86
+	write_file r13, 5
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sal r9, 31
 	sar r9, 31
 	sal r10, 31
@@ -842,6 +1590,32 @@ Greateru:
 	
 
 Slti:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+73
+	mov rdx,5
+	syscall
+
+	push r13
+	mov r13, instruccion+73
+	write_file r13, 5
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	cmp r10, r11
 	jg GreaterI
 	mov rax, 0x1
@@ -855,6 +1629,32 @@ GreaterI:
 	jmp Begin
 
 Sltiu:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+79
+	mov rdx,6
+	syscall
+
+	push r13
+	mov r13, instruccion+79
+	write_file r13, 6
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sal r10, 31
 	sar r10, 31
 	sal r11, 31
@@ -872,12 +1672,66 @@ GreaterIu:
 	jmp Begin
 
 Sub:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+102
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, instruccion+102
+	write_file r13, 4
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sub r10, r9
 	mov [r8], r10
 	add r15, 0x8
 	jmp Begin
 
 Subu:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+107
+	mov rdx,5
+	syscall
+
+	push r13
+	mov r13, instruccion+107
+	write_file r13, 5
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	sal r9, 31
 	sar r9, 31
 	sal r10, 31
@@ -888,6 +1742,32 @@ Subu:
 	jmp Begin
 
 Sw:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+119
+	mov rdx,3
+	syscall
+
+	push r13
+	mov r13, instruccion+119
+	write_file r13, 3
+	pop r13	
+
+	mov r12, [rt]
+	call _imprimirRegistro	
+	mov r12, [rs]
+	call _imprimirRegistro
+	call _inmediate
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	add r10, r11
 	mov rax, 0x8
 	mul r10
@@ -898,6 +1778,33 @@ Sw:
 	jmp Begin
 
 Mul:
+	push r11	
+	push r10
+	push r9
+	push r8
+	mov rax,1
+	mov rdi,1
+	mov rsi, instruccion+113
+	mov rdx,5
+	syscall
+
+	push r13
+	mov r13, instruccion+113
+	write_file r13, 5
+	pop r13	
+
+	mov r12, [rd]
+	call _imprimirRegistro
+	mov r12, [rs]
+	call _imprimirRegistro
+	mov r12, [rt]
+	call _imprimirRegistro
+
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+
 	mov rax, r9
 	imul r10
 	mov [r8], rax
@@ -911,6 +1818,9 @@ Error_address:
 	mov rsi,error_tres
 	mov rdx,e3_tamano
 	syscall
+
+	write_file error_tres, e3_tamano	
+
 	jmp Perror
 
 Error_registro:
@@ -920,6 +1830,9 @@ Error_registro:
 	mov rsi,error_cuatro
 	mov rdx,e4_tamano
 	syscall
+
+	write_file error_cuatro, e4_tamano
+
 	jmp Perror
 
 Perror:
@@ -928,6 +1841,9 @@ Perror:
 	mov rsi,fallida
 	mov rdx,fallida_tamano
 	syscall
+
+	write_file fallida, fallida_tamano
+
 	jmp Exit
 
 
@@ -937,6 +1853,9 @@ Pexito:
 	mov rsi,exitosa
 	mov rdx,exitosa_tamano
 	syscall
+
+	write_file exitosa, exitosa_tamano
+
 	jmp Exit
 
 No_encontrado:
@@ -945,7 +1864,81 @@ No_encontrado:
 	mov rsi,no_encontrado
 	mov rdx,no_encontrado_tamano
 	syscall
+
+	write_file no_encontrado, no_encontrado_tamano	
+
 	jmp Perror
+
+;--------------------------------------------------------------
+;		LLAMADA PARA HACER ESPACIO STACK
+;--------------------------------------------------------------
+
+stack:
+	mov r12, [Re29]
+	mov r10, 0x0000000000008000
+	mov r13, 0x0
+	and r10, r11 ; Se hace la mascara bitSigno para 
+	cmp r10, r13
+	je _positivoStack
+	jne _negativoStack
+
+_negativoStack:
+	mov r10, 0xFFFFFFFFFFFF0000
+	or r10, r11
+	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
+	add r12, r10 ; Se calcula nueva direccion
+	mov r13, stack0
+
+	cmp r13, r12 ; si la direccion stack0 es mayor a dir nueva
+	jg ErrorStack1
+	mov [Re29], r12
+	add r15, 0x8
+	jmp Begin
+
+
+_positivoStack:
+	mov r10, 0x000000000000FFFF
+	and r10, r11 ;Mascara para inmediate
+	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
+	add r12, r10 ; Se calcula nueva direccion
+	mov r13, stack39
+	add r13, 0x8
+	cmp r12, r13 ; si la direccion nueva es mayor a stack39
+	jg ErrorStack2
+	mov [Re29], r12
+	add r15, 0x8
+	jmp Begin
+
+;----------------------------------------------------------------
+
+;----------------------------------------------------------------
+
+ErrorStack1:
+	;ERROR DE STACK
+	mov rax,1
+	mov rdi,1
+	mov rsi,errorstack1
+	mov rdx,errorstack_tamano1
+	syscall
+
+	write_file errorstack1, errorstack_tamano1
+
+	jmp Exit
+
+ErrorStack2:
+	;ERROR DE STACK
+	mov rax,1
+	mov rdi,1
+	mov rsi,errorstack2
+	mov rdx,errorstack_tamano2
+	syscall
+
+	write_file errorstack2, errorstack_tamano2
+
+	jmp Exit
+
+
+
 
 Exit:
 	mov rax,1
@@ -954,6 +1947,8 @@ Exit:
 	mov rdx,finalizar_tamano
 	syscall
 	
+	write_file finalizar, finalizar_tamano
+
 	mov rax, 0
 	mov rdi, 0
 	mov rsi, letra
@@ -971,6 +1966,7 @@ Exit:
 	mov rdx,nombres_tamano
 	syscall
 
+	write_file nombres, nombres_tamano
 	
 	mov r8, [Re0]
 	mov r9, [Re1]
@@ -1014,6 +2010,11 @@ _printRAXLoop2:
     mov rsi, rcx
     mov rdx, 1
     syscall
+
+    push r12
+    mov r12, rcx
+    write_file r12, 1
+    pop r12
  
     mov rcx, [digitSpacePos]
     dec rcx
@@ -1024,6 +2025,625 @@ _printRAXLoop2:
  
     ret
 
+;777777777777777777777777777777777777777777777777777777777777777777777
+
+_inmediate:
+	mov r12, [inmediate]
+	mov r10, 0x8000
+	and r10, r12
+	mov r13, 0x0	
+	cmp r10, r13
+	je posi
+	jne nega
+
+posi:
+	mov rax, r12
+	call _printRAX
+	ret
+
+nega:
+	mov r13, 0xFFFFFFFFFFFF0000
+	or r12, r13
+	not r12
+	add r12, 0x1	
+
+	mov rax,1
+	mov rdi,1
+	mov rsi,guion
+	mov rdx,1
+	syscall
+
+	write_file guion, 1
+
+	mov rax, r12
+	call _printRAX
+	ret
+
+
+
+_datosInternos:
+	mov r10, 0x8000000000000000
+	and r10, r12
+	mov r13, 0x0	
+	cmp r10, r13
+	je posi
+	jne nega
+
+posit:
+	mov rax, r12
+	call _printRAX
+	ret
+
+negat:
+	mov rax,1
+	mov rdi,1
+	mov rsi,guion
+	mov rdx,1
+	syscall
+
+	write_file guion, 1
+
+	mov rax, r12
+	call _printRAX
+	ret	
+	
+	
+
+;777777777777777777777777777777777777777777777777777777777777777777777
+
+
+
+_imprimirRegistro:
+
+;Registro r12 tiene el valor del rt, rd, rs
+
+	mov r13, 0x0
+	cmp r12, r13
+	je printR0
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR1
+	
+	add r13, 0x1
+	cmp r12, r13
+	je printR2
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR3
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR4
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR5
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR6
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR7
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR8
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR9
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR10
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR11
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR12
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR13
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR14
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR15
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR16
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR17
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR18
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR19
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR20
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR21
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR22
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR23
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR24
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR25
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR26
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR27
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR28
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR29
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR30
+
+	add r13, 0x1
+	cmp r12, r13
+	je printR31
+
+
+
+;-------------------------------------------------
+;+++++++++++++++++++++++++++++++++++++++++++++++++
+
+printR0:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros ;$zero
+	mov rdx,6
+	syscall
+
+	write_file registros, 6
+
+	ret
+
+printR1:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+7 ;$at
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+7
+	write_file r13, 4
+	pop r13
+	ret
+printR2:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+12 ;$v0
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+12
+	write_file r13, 4
+	pop r13
+
+	ret
+printR3:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+17 ;$v1
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+17
+	write_file r13, 4
+	pop r13
+
+	ret
+printR4:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+22 ;$a0
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+22
+	write_file r13, 4
+	pop r13
+
+	ret
+printR5:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+27 ;$a1
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+27
+	write_file r13, 4
+	pop r13
+
+	ret
+printR6:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+32 ;$a2
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+32
+	write_file r13, 4
+	pop r13
+
+	ret
+printR7:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+37 ;$a3
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+37
+	write_file r13, 4
+	pop r13
+
+	ret
+printR8:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+42
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+42
+	write_file r13, 4
+	pop r13
+
+	ret
+printR9:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+47
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+47
+	write_file r13, 4
+	pop r13
+
+	ret
+printR10:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+52
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+52
+	write_file r13, 4
+	pop r13
+
+	ret
+printR11:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+57
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+57
+	write_file r13, 4
+	pop r13
+
+	ret
+printR12:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+62
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+62
+	write_file r13, 4
+	pop r13
+
+	ret
+printR13:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+67
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+67
+	write_file r13, 4
+	pop r13
+
+	ret
+printR14:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+72
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+72
+	write_file r13, 4
+	pop r13
+
+	ret
+printR15:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+77
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+77
+	write_file r13, 4
+	pop r13
+
+	ret
+printR16:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+82
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+82
+	write_file r13, 4
+	pop r13
+
+	ret
+printR17:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+87
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+87
+	write_file r13, 4
+	pop r13
+	ret
+printR18:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+92
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+92
+	write_file r13, 4
+	pop r13
+
+	ret
+printR19:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+97
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+97
+	write_file r13, 4
+	pop r13
+
+	ret
+printR20:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+102
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+102
+	write_file r13, 4
+	pop r13
+
+	ret
+printR21:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+107
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+107
+	write_file r13, 4
+	pop r13
+
+	ret
+printR22:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+112
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+112
+	write_file r13, 4
+	pop r13
+
+	ret
+printR23:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+117
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+117
+	write_file r13, 4
+	pop r13
+	ret
+printR24:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+122
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+122
+	write_file r13, 4
+	pop r13
+
+	ret
+printR25:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+127
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+127
+	write_file r13, 4
+	pop r13
+
+	ret
+printR26:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+132
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+132
+	write_file r13, 4
+	pop r13
+
+	ret
+printR27:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+137
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+137
+	write_file r13, 4
+	pop r13
+
+	ret
+printR28:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+142
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+142
+	write_file r13, 4
+	pop r13
+
+	ret
+printR29:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+147
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+147
+	write_file r13, 4
+	pop r13
+
+	ret
+printR30:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+152
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+152
+	write_file r13, 4
+	pop r13
+
+	ret
+printR31:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+157
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+157
+	write_file r13, 4
+	pop r13
+
+	ret
+;+++++++++++++++++++++++++++++++++++++++++++++++++
+;-------------------------------------------------
+
 datos:
 	;PRINT $V0
 	mov rax,1
@@ -1032,8 +2652,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re2]
-	call _printRAX
+	push r13
+	mov r13, registros+12
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re2]
+	call _datosInternos
 
 	;PRINT $V1
 	mov rax,1
@@ -1042,8 +2667,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re3]
-	call _printRAX
+	push r13
+	mov r13, registros+17
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re3]
+	call _datosInternos
 
 	;PRINT $a0
 	mov rax,1
@@ -1052,8 +2682,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re4]
-	call _printRAX
+	push r13
+	mov r13, registros+22
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re4]
+	call _datosInternos
 
 	;PRINT $a1
 	mov rax,1
@@ -1062,8 +2697,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re5]
-	call _printRAX
+	push r13
+	mov r13, registros+27
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re5]
+	call _datosInternos
 
 	;PRINT $a2
 	mov rax,1
@@ -1072,8 +2712,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re6]
-	call _printRAX
+	push r13
+	mov r13, registros+32
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re6]
+	call _datosInternos
 
 	;PRINT $a3
 	mov rax,1
@@ -1082,8 +2727,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re7]
-	call _printRAX
+	push r13
+	mov r13, registros+37
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re7]
+	call _datosInternos
 
 	;PRINT $s0
 	mov rax,1
@@ -1092,8 +2742,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re16]
-	call _printRAX
+	push r13
+	mov r13, registros+82
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re16]
+	call _datosInternos
 
 	;PRINT $s1
 	mov rax,1
@@ -1102,8 +2757,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re17]
-	call _printRAX
+	push r13
+	mov r13, registros+87
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re17]
+	call _datosInternos
 
 	;PRINT $s2
 	mov rax,1
@@ -1112,8 +2772,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re18]
-	call _printRAX
+	push r13
+	mov r13, registros+92
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re18]
+	call _datosInternos
 
 	;PRINT $s3
 	mov rax,1
@@ -1122,8 +2787,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re19]
-	call _printRAX
+	push r13
+	mov r13, registros+97
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re19]
+	call _datosInternos
 
 	;PRINT $s4
 	mov rax,1
@@ -1132,8 +2802,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re20]
-	call _printRAX
+	push r13
+	mov r13, registros+102
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re20]
+	call _datosInternos
 
 	;PRINT $s5
 	mov rax,1
@@ -1142,8 +2817,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re21]
-	call _printRAX
+	push r13
+	mov r13, registros+107
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re21]
+	call _datosInternos
 
 	;PRINT $s6
 	mov rax,1
@@ -1152,8 +2832,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re22]
-	call _printRAX
+	push r13
+	mov r13, registros+112
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re22]
+	call _datosInternos
 
 	;PRINT $s7
 	mov rax,1
@@ -1162,8 +2847,13 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re23]
-	call _printRAX
+	push r13
+	mov r13, registros+117
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re23]
+	call _datosInternos
 
 	;PRINT $sp
 	mov rax,1
@@ -1172,7 +2862,12 @@ datos:
 	mov rdx,4
 	syscall
 
-	mov rax, [Re29]
-	call _printRAX
+	push r13
+	mov r13, registros+147
+	write_file r13, 4
+	pop r13
+
+	mov r12, [Re29]
+	call _datosInternos
 
 	ret
