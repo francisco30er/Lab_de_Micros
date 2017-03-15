@@ -1,0 +1,118 @@
+     1                                  ; printf2_64.asm  use "C" printf on char, string, int, long int, float, double
+     2                                  ; 
+     3                                  ; Assemble:	nasm -f elf64 -l printf2_64.lst  printf2_64.asm
+     4                                  ; Link:		gcc -m64 -o printf2_64  printf2_64.o
+     5                                  ; Run:		./printf2_64 > printf2_64.out
+     6                                  ; Output:	cat printf2_64.out
+     7                                  ; 
+     8                                  ; A similar "C" program   printf2_64.c 
+     9                                  ; #include <stdio.h>
+    10                                  ; int main()
+    11                                  ; {
+    12                                  ;   char      char1='a';            /* sample character */
+    13                                  ;   char      str1[]="mystring";    /* sample string */
+    14                                  ;   int       len=9;                /* sample string */
+    15                                  ;   int       inta1=12345678;       /* sample integer 32-bit */
+    16                                  ;   long int  inta2=12345678900;    /* sample long integer 64-bit */
+    17                                  ;   long int  hex1=0x123456789ABCD; /* sample hexadecimal 64-bit*/
+    18                                  ;   float     flt1=5.327e-30;       /* sample float 32-bit */
+    19                                  ;   double    flt2=-123.4e300;      /* sample double 64-bit*/
+    20                                  ; 
+    21                                  ;   printf("printf2_64: flt2=%e\n", flt2);
+    22                                  ;   printf("char1=%c, r10=%s, len=%d\n", char1, r10, len);
+    23                                  ;   printf("char1=%c, r10=%s, len=%d, inta1=%d, inta2=%ld\n",
+    24                                  ;          char1, r10, len, inta1, inta2);
+    25                                  ;   printf("hex1=%lX, flt1=%e, flt2=%e\n", hex1, flt1, flt2);
+    26                                  ;   return 0;
+    27                                  ; }
+    28                                          extern printf                   ; the C function to be called
+    29                                  
+    30                                          SECTION .data                   ; Data section
+    31                                  
+    32                                  					; format strings for printf
+    33 00000000 7072696E7466323A20-     fmt2:   db "printf2: flt2=%e", 10, 0
+    34 00000009 666C74323D25650A00 
+    35 00000012 63686172313D25632C-     fmt3:	db "char1=%c, str1=%s, len=%d", 10, 0
+    36 0000001B 20737472313D25732C-
+    37 00000024 206C656E3D25640A00 
+    38 0000002D 63686172313D25632C-     fmt4:	db "char1=%c, str1=%s, len=%d, inta1=%d, inta2=%ld", 10, 0
+    39 00000036 20737472313D25732C-
+    40 0000003F 206C656E3D25642C20-
+    41 00000048 696E7461313D25642C-
+    42 00000051 20696E7461323D256C-
+    43 0000005A 640A00             
+    44 0000005D 686578313D256C582C-     fmt5:	db "hex1=%lX, flt1=%e, flt2=%e", 10, 0
+    45 00000066 20666C74313D25652C-
+    46 0000006F 20666C74323D25650A-
+    47 00000078 00                 
+    48                                  	
+    49 00000079 61                      char1:	db	'a'			; a character 
+    50 0000007A 6D79737472696E6700      str1:	db	"mystring",0	        ; a C string, "string" needs 0
+    51                                  len:	equ	$-str1			; len has value, not an address
+    52 00000083 4E61BC00                inta1:	dd	12345678		; integer 12345678, note dd
+    53 00000087 341CDCDF02000000        inta2:	dq	12345678900		; long integer 12345678900, note dq
+    54 0000008F CDAB896745230100        hex1:	dq	0x123456789ABCD	        ; long hex constant, note dq
+    55 00000097 BB16D80E                flt1:	dd	5.327e-30		; 32-bit floating point, note dd
+    56 0000009B 6ED768D3250BA7FE        flt2:	dq	-123.456789e300	        ; 64-bit floating point, note dq
+    57                                  
+    58                                  	SECTION .bss
+    59                                  		
+    60 00000000 <res 00000008>          flttmp:	resq 1			        ; 64-bit temporary for printing flt1
+    61                                  	
+    62                                          SECTION .text                   ; Code section.
+    63                                  
+    64                                  
+    65                                  
+    66                                          global	main		       ; "C" main program 
+    67                                  	
+    68                                         
+    69 00000000 55                      	push rbp
+    70 00000001 4889E5                  	mov rbp,rsp
+    71 00000004 4C8B4508                	mov r8, [rbp+8]
+    72 00000008 4981E8603E0000          	sub r8,15968
+    73                                  	
+    74                                  main:				        ; label, start of main program
+    75 0000000F 55                      	push    rbp			; set up stack frame 
+    76 00000010 D90425[97000000]        	fld	dword [flt1]	        ; need to convert 32-bit to 64-bit
+    77 00000017 DD1C25[00000000]        	fstp	qword [flttmp]          ; floating load makes 80-bit,
+    78                                  	                                ; store as 64-bit
+    79 0000001E 48BF-                   	mov	rdi,fmt2
+    80 00000020 [0000000000000000] 
+    81 00000028 F30F7E0425-             	movq	xmm0, qword [flt2]
+    82 0000002D [9B000000]         
+    83 00000031 B801000000              	mov	rax, 1			; 1 xmm register
+    84 00000036 E8(00000000)            	call	printf
+    85                                  
+    86 0000003B 48BF-                   	mov	rdi, fmt3		; first arg, format
+    87 0000003D [1200000000000000] 
+    88 00000045 488B3425[79000000]      	mov	rsi, [char1]		; second arg, char
+    89 0000004D 48BA-                   	mov	rdx, str1		; third arg, string
+    90 0000004F [7A00000000000000] 
+    91 00000057 B909000000              	mov	rcx, len		; fourth arg, int
+    92 0000005C B800000000              	mov	rax, 0			; no xmm used
+    93 00000061 E8(00000000)            	call	printf
+    94                                  
+    95 00000066 48BF-                   	mov	rdi, fmt4		; first arg, format
+    96 00000068 [2D00000000000000] 
+    97 00000070 488B3425[79000000]      	mov	rsi, [char1]		; second arg, char
+    98 00000078 48BA-                   	mov	rdx, str1		; third arg, string
+    99 0000007A [7A00000000000000] 
+   100 00000082 B909000000              	mov	rcx, len		; fourth arg, int
+   101 00000087 4C8B0425[83000000]      	mov	r8, [inta1]		; fifth arg, inta1 32->64
+   102 0000008F 4C8B0C25[87000000]      	mov	r9, [inta2]		; sixth arg, inta2
+   103 00000097 B800000000              	mov	rax, 0			; no xmm used
+   104 0000009C E8(00000000)            	call	printf
+   105                                  
+   106 000000A1 48BF-                   	mov	rdi, fmt5		; first arg, format
+   107 000000A3 [5D00000000000000] 
+   108 000000AB 488B3425[8F000000]      	mov	rsi, [hex1]		; second arg, char
+   109 000000B3 F30F7E0425-             	movq	xmm0, qword [flttmp]    ; first double
+   110 000000B8 [00000000]         
+   111 000000BC F30F7E0C25-             	movq	xmm1, qword [flt2]	; second double
+   112 000000C1 [9B000000]         
+   113 000000C5 B802000000              	mov	rax, 2			; 2 xmm used
+   114 000000CA E8(00000000)            	call	printf
+   115                                  	
+   116 000000CF 5D                      	pop	rbp			; restore stack	
+   117 000000D0 B800000000                      mov     rax, 0			; exit code, 0=normal
+   118 000000D5 C3                              ret				; main returns to operating system

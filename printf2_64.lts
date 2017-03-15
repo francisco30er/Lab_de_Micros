@@ -1,0 +1,129 @@
+     1                                  
+     2                                  ; 
+     3                                  ; Assemble:	nasm -f elf64 -l printf2_64.lst  printf2_64.asm
+     4                                  ; Link:		gcc -m64 -o printf2_64  printf2_64.o
+     5                                  ; Run:		./printf2_64 > printf2_64.out
+     6                                  ; Output:	cat printf2_64.out
+     7                                  ; 
+     8                                  ; A similar "C" program   printf2_64.c 
+     9                                  ; #include <stdio.h>
+    10                                  ; int main()
+    11                                  ; {
+    12                                  ;   char      char1='a';            /* sample character */
+    13                                  ;   char      str1[]="mystring";    /* sample string */
+    14                                  ;   int       len=9;                /* sample string */
+    15                                  ;   int       inta1=12345678;       /* sample integer 32-bit */
+    16                                  ;   long int  inta2=12345678900;    /* sample long integer 64-bit */
+    17                                  ;   long int  hex1=0x123456789ABCD; /* sample hexadecimal 64-bit*/
+    18                                  ;   float     flt1=5.327e-30;       /* sample float 32-bit */
+    19                                  ;   double    flt2=-123.4e300;      /* sample double 64-bit*/
+    20                                  ; 
+    21                                  ;   printf("printf2_64: flt2=%e\n", flt2);
+    22                                  ;   printf("char1=%c, srt1=%s, len=%d\n", char1, str1, len);
+    23                                  ;   printf("char1=%c, srt1=%s, len=%d, inta1=%d, inta2=%ld\n",
+    24                                  ;          char1, str1, len, inta1, inta2);
+    25                                  ;   printf("hex1=%lX, flt1=%e, flt2=%e\n", hex1, flt1, flt2);
+    26                                  ;   return 0;
+    27                                  ; }
+    28                                          extern printf                   ; the C function to be called
+    29                                  
+    30                                          SECTION .data                   ; Data section
+    31                                  
+    32                                  					; format strings for printf
+    33 00000000 7072696E7466323A20-     fmt2:   db "printf2: flt2=%e", 10, 0
+    34 00000009 666C74323D25650A00 
+    35 00000012 63686172313D25632C-     fmt3:	db "char1=%c, str1=%s, len=%q", 10, 0
+    36 0000001B 20737472313D25732C-
+    37 00000024 206C656E3D25710A00 
+    38 0000002D 63686172313D25632C-     fmt4:	db "char1=%c, str1=%s, len=%q, inta1=%d, inta2=%ld", 10, 0
+    39 00000036 20737472313D25732C-
+    40 0000003F 206C656E3D25712C20-
+    41 00000048 696E7461313D25642C-
+    42 00000051 20696E7461323D256C-
+    43 0000005A 640A00             
+    44 0000005D 686578313D256C582C-     fmt5:	db "hex1=%lX, flt1=%e, flt2=%e", 10, 0
+    45 00000066 20666C74313D25652C-
+    46 0000006F 20666C74323D25650A-
+    47 00000078 00                 
+    48                                  	
+    49 00000079 61                      char1:	db	'a'			; a character 
+    50 0000007A 6D79737472696E6700      str1:	db	"mystring",0	        ; a C string, "string" needs 0
+    51                                  len:	equ	$-str1			; len has value, not an address
+    52 00000083 4E61BC00                inta1:	dd	12345678		; integer 12345678, note dd
+    53 00000087 341CDCDF02000000        inta2:	dq	12345678900		; long integer 12345678900, note dq
+    54 0000008F CDAB896745230100        hex1:	dq	0x123456789ABCD	        ; long hex constant, note dq
+    55 00000097 BB16D80E                flt1:	dd	5.327e-30		; 32-bit floating point, note dd
+    56 0000009B 6ED768D3250BA7FE        flt2:	dq	-123.456789e300	        ; 64-bit floating point, note dq
+    57                                  
+    58                                  	SECTION .bss
+    59                                  		
+    60 00000000 <res 00000008>          flttmp:	resq 1			        ; 64-bit temporary for printing flt1
+    61                                  	
+    62                                          SECTION .text                   ; Code section.
+    63                                  
+    64                                          global	main		        ; "C" main program
+    65                                  
+    66 00000000 55                      	push rbp
+    67                                  	
+    68 00000001 4889E5                  	mov rbp,rsp
+    69                                  	
+    70 00000004 488B4518                	mov rax,[rbp+24]
+    71 00000008 4C8B00                  	mov r8, [rax]
+    72 0000000B 4989C5                  	mov r13,rax
+    73 0000000E 48890425[12000000]      	mov [fmt3],rax
+    74 00000016 5D                      	pop rbp
+    75                                  
+    76                                  main:				        ; label, start of main program
+    77 00000017 55                      	push    rbp			; set up stack frame 
+    78 00000018 D90425[97000000]        	fld	dword [flt1]	        ; need to convert 32-bit to 64-bit
+    79 0000001F DD1C25[00000000]        	fstp	qword [flttmp]          ; floating load makes 80-bit,
+    80                                  	                                ; store as 64-bit
+    81 00000026 48BF-                   	mov	rdi,fmt2
+    82 00000028 [0000000000000000] 
+    83 00000030 F30F7E0425-             	movq	xmm0, qword [flt2]
+    84 00000035 [9B000000]         
+    85 00000039 B801000000              	mov	rax, 1			; 1 xmm register
+    86 0000003E E8(00000000)            	call	printf
+    87                                  
+    88 00000043 48BF-                   	mov	rdi, fmt3		; first arg, format
+    89 00000045 [1200000000000000] 
+    90 0000004D 488B3425[79000000]      	mov	rsi, [char1]		; second arg, char
+    91 00000055 4C89EA                  	mov	rdx, r13		; third arg, string
+    92 00000058 B909000000              	mov	rcx, len		; fourth arg, int
+    93 0000005D B800000000              	mov	rax, 0			; no xmm used
+    94 00000062 E8(00000000)            	call	printf
+    95                                  
+    96 00000067 48BF-                   	mov	rdi, fmt4		; first arg, format
+    97 00000069 [2D00000000000000] 
+    98 00000071 488B3425[79000000]      	mov	rsi, [char1]		; second arg, char
+    99 00000079 4C89EA                  	mov	rdx, r13		; third arg, string
+   100 0000007C B909000000              	mov	rcx, len		; fourth arg, int
+   101 00000081 4C8B0425[83000000]      	mov	r8, [inta1]		; fifth arg, inta1 32->64
+   102 00000089 4C8B0C25[87000000]      	mov	r9, [inta2]		; sixth arg, inta2
+   103 00000091 B800000000              	mov	rax, 0			; no xmm used
+   104 00000096 E8(00000000)            	call	printf
+   105                                  
+   106 0000009B 48BF-                   	mov	rdi, fmt5		; first arg, format
+   107 0000009D [5D00000000000000] 
+   108 000000A5 488B3425[8F000000]      	mov	rsi, [hex1]		; second arg, char
+   109 000000AD F30F7E0425-             	movq	xmm0, qword [flttmp]    ; first double
+   110 000000B2 [00000000]         
+   111 000000B6 F30F7E0C25-             	movq	xmm1, qword [flt2]	; second double
+   112 000000BB [9B000000]         
+   113 000000BF B802000000              	mov	rax, 2			; 2 xmm used
+   114 000000C4 E8(00000000)            	call	printf
+   115                                  	
+   116 000000C9 5D                      	pop	rbp			; restore stack	
+   117 000000CA B800000000                      mov     rax, 0			; exit code, 0=normal
+   118 000000CF C3                              ret				; main returns to operating system
+   119                                  
+   120                                  
+   121                                  
+   122                                  
+   123                                  
+   124                                  
+   125                                  
+   126                                  
+   127                                  
+   128                                  
+   129                                  
