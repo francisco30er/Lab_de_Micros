@@ -1,0 +1,9 @@
+EL4313-Lab. Estructura de Microprocesadores - 1S-2017
+Buscando ROM.txt
+Archivo ROM.txt encontrado
+APRETE ENTER*******************************
+$v0 AAA$v1 AAA$a0 AAA$a1 AAA$a2 AAAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAaddi $sp $sp -AAA*******************************
+$v0 AAA$v1 AAA$a0 AAA$a1 AAA$a2 AAAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAaddi $a1 $t0 -AAA*******************************
+$v0 AAA$v1 AAA$a0 AAA$a1 -AAA$a2 AAAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAadd $at $at $at *******************************
+$v0 AAA$v1 AAA$a0 AAA$a1 -AAA$a2 AAAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAsll $zero $zero $zero Ejecucion Exitosa
+Presione Enter para finalizar
