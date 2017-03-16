@@ -105,6 +105,17 @@ registros_tamano: equ $-registros
 asteriscos: db '*******************************', 0xa
 asteriscos_tamano: equ $-asteriscos
 
+zero: db '0'
+one: db '1'
+two: db '2'
+three: db '3'
+four: db '4'
+five: db '5'
+six: db '6'
+seven: db '7'
+eight: db '8'
+nine: db '9'
+
 rt DQ 0x0
 rd DQ 0x0
 rs DQ 0x0
@@ -113,6 +124,7 @@ address DQ 0x0
 
 resul db "resultados.txt"
 
+protect DQ 0x0000000000000000
 
 Re0 DQ 0x0000000000000000
 Re1 DQ 0x0000000000000001
@@ -349,7 +361,7 @@ I149 DQ 0xffffffff00000000
 
 
 
-file db "archivo5.txt"
+file db "ROM.txt"
 
 
 
@@ -1968,18 +1980,20 @@ Exit:
 
 	write_file nombres, nombres_tamano
 	
-	mov r8, [Re0]
-	mov r9, [Re1]
-	mov r10, [Re2]
-	mov r11, [Re3]
-	mov r12, [I0]
-	mov r13, [I1]
+	mov r8, [I5]
+	mov r9, [I6]
+	mov r10, [I7]
+	mov r11, [I8]
+	mov r12, [I9]
+	mov r13, [I10]
 C:
 	mov rax, 60
 	mov rdi, 0
 	syscall
 
 _printRAX:
+    mov [protect], r10
+    mov r10, 0x0
     mov rcx, digitSpace
     mov rbx, 10
     mov [rcx], rbx
@@ -1992,12 +2006,13 @@ _printRAXLoop:
     div rbx
     push rax
     add rdx, 48
+
  
     mov rcx, [digitSpacePos]
     mov [rcx], dl
     inc rcx
     mov [digitSpacePos], rcx
-   
+
     pop rax
     cmp rax, 0
     jne _printRAXLoop
@@ -2011,11 +2026,17 @@ _printRAXLoop2:
     mov rdx, 1
     syscall
 
+    mov rax, 0x1
+    cmp r10, rax
+    jne P
     push r12
+    mov rcx, [digitSpacePos]
     mov r12, rcx
     write_file r12, 1
     pop r12
- 
+P:
+    mov r10, 0x1
+
     mov rcx, [digitSpacePos]
     dec rcx
     mov [digitSpacePos], rcx
@@ -2023,6 +2044,7 @@ _printRAXLoop2:
     cmp rcx, digitSpace
     jge _printRAXLoop2
  
+    mov r10, [protect]
     ret
 
 ;777777777777777777777777777777777777777777777777777777777777777777777
@@ -2871,3 +2893,4 @@ datos:
 	call _datosInternos
 
 	ret
+
