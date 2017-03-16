@@ -86,6 +86,9 @@ rs DQ 0x0
 inmediate DQ 0x0
 address DQ 0x0
 
+adrs DQ 0x0
+adrd DQ 0x0
+adrt DQ 0x0
 
 Re0 DQ 0x0000000000000000
 Re1 DQ 0x0000000000000001
@@ -276,49 +279,48 @@ I149 DQ 0xffffffff00000000
 ;--------------------- stack ---------------------------------------
 
 
-	Contador DQ 0x8	
+	;Contador DQ 0x8	
 
-	stack0 DQ 9h 
-	stack1 DQ 8h
-	stack2 DQ 7h
-	stack3 DQ 6h
-	stack4 DQ 5h
-	stack5 DQ 4h
-	stack6 DQ 3h
-	stack7 DQ 2h
-	stack8 DQ 1h
-	stack9 DQ 0h
-	stack10 DQ 9h 
-	stack11 DQ 8h
-	stack12 DQ 7h
-	stack13 DQ 6h
-	stack14 DQ 5h
-	stack15 DQ 4h
-	stack16 DQ 3h
-	stack17 DQ 2h
-	stack18 DQ 1h
-	stack19 DQ 0h
-	stack20 DQ 9h 
-	stack21 DQ 8h
-	stack22 DQ 7h
-	stack23 DQ 6h
-	stack24 DQ 5h
-	stack25 DQ 4h
-	stack26 DQ 3h
-	stack27 DQ 2h
-	stack28 DQ 1h
-	stack29 DQ 0h
-	stack30 DQ 9h 
-	stack31 DQ 8h
-	stack32 DQ 7h
-	stack33 DQ 6h
-	stack34 DQ 5h
-	stack35 DQ 4h
-	stack36 DQ 3h
-	stack37 DQ 2h
-	stack38 DQ 1h
-	stack39 DQ 0h
-
+	stack0 DD 9h 
+	stack1 DD 8h
+	stack2 DD 7h
+	stack3 DD 6h
+	stack4 DD 5h
+	stack5 DD 4h
+	stack6 DD 3h
+	stack7 Dd 2h
+	stack8 DD 1h
+	stack9 DD 0h
+	stack10 dD 9h 
+	stack11 DD 8h
+	stack12 DD 7h
+	stack13 DD 6h
+	stack14 DD 5h
+	stack15 DD 4h
+	stack16 DD 3h
+	stack17 DD 2h
+	stack18 DD 1h
+	stack19 DD 0h
+	stack20 DD 9h 
+	stack21 DD 8h
+	stack22 DD 7h
+	stack23 DD 6h
+	stack24 DD 5h
+	stack25 DD 4h
+	stack26 DD 3h
+	stack27 DD 2h
+	stack28 DD 1h
+	stack29 DD 0h
+	stack30 DD 9h 
+	stack31 DD 8h
+	stack32 DD 7h
+	stack33 DD 6h
+	stack34 DD 5h
+	stack35 DD 4h
+	stack36 DD 3h
+	stack37 DD 2h
+	stack38 DD 0xff
+	stack39 DD 0xA
 
 
 
@@ -340,8 +342,14 @@ global _start
 _start:
 
 	mov rax, stack39
-	add rax, 0x-8
+	add rax, 0x4
 	mov [Re29], rax
+
+mov rbx, stack39
+mov rcx, stack38
+mov rdx, stack37
+mov r8, [Re29]
+
 
 First:
 	mov rax,1
@@ -518,6 +526,8 @@ Begin:
 	mov r9, Re0
 	add r9, rax
 	
+	mov [adrt], r9
+	
 
 	;COMPRUEBA SI RT ES $ZERO
 ;	mov rax, Re0
@@ -535,6 +545,9 @@ Begin:
 	mul r10
 	mov r10, Re0
 	add r10, rax
+
+	mov [adrs], r10
+
 	mov r13, r10
 	mov r10, [r10]
 
@@ -1167,10 +1180,13 @@ JumpLink:
 ;----------------------------------------------------
 ;		GUARDADO DE PC+4 EN STACK
 	mov r8, [Re29] ; Obtengo la direccion del stack pointer
-	sub r8, 0x8 ; Le resto 8 para pasar al campo que se pueda usar
+	sub r8, 0x4 ; Le resto 4 para pasar al campo que se pueda usar
 	mov r10, 0x8	
 	add r10, r15
-	mov [r8], r10
+	mov [r8], r10d ; Guardo el pc+4
+
+
+
 ;---------------------------------------------------
 	mov r15, r11
 	jmp Begin
@@ -1197,14 +1213,13 @@ Lw:
 	pop r10
 	pop r11
 
-	add r10, r11
-	mov rax, 0x8
-	mul r10
-	mov r8, I0; SE DEBE CAMBIAR I0 POR POSICION DE MEMORIA!!!!
-	add r8, rax
-	mov [r9], r8; REVISAR ESTA LINEA
-	add r15, 0x8
+
+	add r10, r11 ; rs + inmediate = base + offset
+	mov r13d, [r10]	;Valor de la direccion
+	mov [r9], r13d
+	add r15, 0x8	
 	jmp Begin
+
 
 Nor:
 	push r11	
@@ -1597,14 +1612,12 @@ Sw:
 	pop r10
 	pop r11
 
-	add r10, r11
-	mov rax, 0x8
-	mul r10
-	mov r8, I0; SE DEBE CAMBIAR I0 POR POSICION DE MEMORIA!!!!!
-	add r8, r10
-	mov r8, [r9]; REVISAR ESTA LINEA
+	add r10, r11 ; Direccion donde se guardara dato
+	mov r13d,[r9] ; Se obtiene el valor en el registro
+	mov [r10], r13d
 	add r15, 0x8
 	jmp Begin
+
 
 Mul:
 	push r11	
@@ -1694,10 +1707,8 @@ stack:
 _negativoStack:
 	mov r10, 0xFFFFFFFFFFFF0000
 	or r10, r11
-	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
 	add r12, r10 ; Se calcula nueva direccion
 	mov r13, stack0
-
 	cmp r13, r12 ; si la direccion stack0 es mayor a dir nueva
 	jg ErrorStack1
 	mov [Re29], r12
@@ -1708,10 +1719,9 @@ _negativoStack:
 _positivoStack:
 	mov r10, 0x000000000000FFFF
 	and r10, r11 ;Mascara para inmediate
-	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
 	add r12, r10 ; Se calcula nueva direccion
 	mov r13, stack39
-	add r13, 0x8
+	add r13, 0x4
 	cmp r12, r13 ; si la direccion nueva es mayor a stack39
 	jg ErrorStack2
 	mov [Re29], r12
