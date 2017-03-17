@@ -1,0 +1,138 @@
+     1                                  	
+     2                                  section .data
+     3                                  
+     4 00000000 45786365646520656C-     cons_hola: db 'Excede el numero de argumentos segmentation fault everywhere!',0xa
+     5 00000009 206E756D65726F2064-
+     6 00000012 6520617267756D656E-
+     7 0000001B 746F73207365676D65-
+     8 00000024 6E746174696F6E2066-
+     9 0000002D 61756C742065766572-
+    10 00000036 797768657265210A   
+    11                                  cons_tamano: equ $-cons_hola
+    12 0000003E 0000000000000000        M0 DQ 0x0000000000000000; 
+    13 00000046 0000000000000000        M1 DQ 0x0000000000000000;
+    14 0000004E 0000000000000000        M2 DQ 0x0000000000000000;
+    15 00000056 0000000000000000        M3 DQ 0x0000000000000000;
+    16                                  
+    17                                  section .bss
+    18                                   
+    19 00000000 <res 00000064>          argpos resb 100
+    20                                  
+    21                                  section .text
+    22                                  
+    23                                  
+    24                                  global main
+    25                                  
+    26                                  main:
+    27 00000000 41BB00000000            	mov r11,0
+    28 00000006 B801000000              	mov rax,1
+    29                                  	;pop rbx	; se saca argc en rax
+    30                                  	;push rbp
+    31                                  	;mov rbp,rsp
+    32 0000000B 4C8B2F                  	mov r13,[rdi]	;se mueve argc a r8
+    33 0000000E 4983FD01                	cmp r13,1	;no hay argumentos
+    34 00000012 0F84F8000000            	je Exit	;sale del programa
+    35 00000018 4983FD06                	cmp r13,6	;se compara que argc no exceda 6 argumento
+    36 0000001C 0F8DC7000000            	jge Max		;si los excede se sale del programa
+    37                                  	
+    38 00000022 5F                      	pop rdi	;se obtiene el path
+    39 00000023 5F                      	pop rdi
+    40 00000024 E987000000              	jmp final	
+    41                                  darg:	
+    42 00000029 4983ED01                	sub r13,1
+    43 0000002D 4983FB00                	cmp r11,0
+    44 00000031 7412                    	je arg0
+    45 00000033 4983FB01                	cmp r11,1
+    46 00000037 7425                    	je arg1
+    47 00000039 4983FB02                	cmp r11,2
+    48 0000003D 7438                    	je arg2
+    49 0000003F 4983FB03                	cmp r11,3
+    50 00000043 744B                    	je arg3
+    51                                  arg0:
+    52 00000045 4C891425[3E000000]      	mov [M0],r10
+    53 0000004D 4983C301                	add r11,1
+    54 00000051 41BA00000000            	mov r10,0
+    55 00000057 B801000000              	mov rax,1
+    56 0000005C EB4B                    	jmp pop
+    57                                  arg1:	
+    58 0000005E 4C891425[46000000]      	mov [M1],r10
+    59 00000066 4983C301                	add r11,1
+    60 0000006A 41BA00000000            	mov r10,0
+    61 00000070 B801000000              	mov rax,1
+    62 00000075 EB32                    	jmp pop
+    63                                  arg2:
+    64 00000077 4C891425[4E000000]      	mov [M2],r10
+    65 0000007F 4983C301                	add r11,1
+    66 00000083 41BA00000000            	mov r10,0
+    67 00000089 B801000000              	mov rax,1
+    68 0000008E EB19                    	jmp pop
+    69                                  arg3:
+    70 00000090 4C891425[56000000]      	mov [M3],r10
+    71 00000098 4983C301                	add r11,1
+    72 0000009C 41BA00000000            	mov r10,0
+    73 000000A2 B801000000              	mov rax,1
+    74 000000A7 EB00                    	jmp pop
+    75                                  pop:	
+    76 000000A9 4983FD01                	cmp r13,1
+    77 000000AD 7461                    	je Exit
+    78 000000AF 5F                      	pop rdi		;se obtiene el argumento 0
+    79                                  	
+    80                                  	
+    81                                  	
+    82                                  
+    83                                  final:	
+    84 000000B0 448A4B08                	mov r9b,[rbx+8]	;obtiene el ascii de argv0
+    85                                  uno:
+    86 000000B4 4180F800                	cmp r8b,0	;comparo con null
+    87 000000B8 7405                    	je dec	;si termine de leer el argumento salto a calcularlo
+    88 000000BA 48FFC3                  	inc rbx		;me muevo por el argumento hasta el final
+    89                                  		
+    90 000000BD EBF1                    	jmp final	;repito proceso de final
+    91                                  dec:
+    92 000000BF 48FFCB                  	dec rbx
+    93                                  	
+    94 000000C2 448A03                  	mov r8b,[rbx]	; cargo rax en el ultimo valor del argumento
+    95 000000C5 4180F800                	cmp r8b,0
+    96 000000C9 0F845AFFFFFF            	je darg
+    97                                  	
+    98                                  Calarg:
+    99                                  		 
+   100 000000CF 4180E830                	sub r8b,48
+   101 000000D3 50                      	push rax
+   102 000000D4 49F7E0                  	mul r8 
+   103 000000D7 4989C1                  	mov r9,rax
+   104 000000DA 4D01CA                  	add r10,r9
+   105 000000DD 58                      	pop rax
+   106 000000DE 41BC0A000000            	mov r12,10
+   107 000000E4 49F7E4                  	mul r12
+   108 000000E7 EBD6                    	jmp dec
+   109                                  
+   110                                  	
+   111                                  	
+   112                                  Max:
+   113 000000E9 B801000000              	mov rax,1
+   114 000000EE BF01000000              	mov rdi,1
+   115 000000F3 48BE-                   	mov rsi,cons_hola
+   116 000000F5 [0000000000000000] 
+   117 000000FD BA3E000000              	mov rdx,cons_tamano
+   118 00000102 0F05                    	syscall
+   119 00000104 B83C000000              	mov rax,60 
+   120 00000109 BF00000000              	mov rdi,0 
+   121 0000010E 0F05                    	syscall  	
+   122                                        
+   123                                  
+   124                                  
+   125                                  
+   126                                  
+   127                                  
+   128                                  
+   129                                  Exit:
+   130                                  	
+   131 00000110 B83C000000              	mov rax,60 
+   132 00000115 BF00000000              	mov rdi,0 
+   133 0000011A 0F05                    	syscall
+   134                                  
+   135                                  
+   136                                  
+   137                                          
+   138                                  

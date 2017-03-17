@@ -23,7 +23,11 @@
 
 section .data
 
+<<<<<<< HEAD
 cons_hola: db 'Excede el numero de argumentos segmentation fault everywhere!',0xa
+=======
+cons_hola: db 'Excede el numero de argumentos, segmentation fault everywhere!',0xa
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 cons_tamano: equ $-cons_hola
 
 error_uno: db 'La instruccion presenta un OPcode erroneo', 0xa
@@ -114,6 +118,10 @@ address DQ 0x0
 
 resul db "resultados.txt"
 
+<<<<<<< HEAD
+=======
+protect DQ 0x0000000000000000
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 
 Re0 DQ 0x0000000000000000
 Re1 DQ 0x0000000000000001
@@ -299,7 +307,11 @@ I146 DQ 0xffffffff00000000
 I147 DQ 0xffffffff00000000
 I148 DQ 0xffffffff00000000
 I149 DQ 0xffffffff00000000
+<<<<<<< HEAD
 
+=======
+I150 DQ 0xffffffff00000000
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 
 ;--------------------- stack ---------------------------------------
 
@@ -350,8 +362,12 @@ I149 DQ 0xffffffff00000000
 
 
 
+<<<<<<< HEAD
 file db "archivo5.txt"
 
+=======
+file db "ROM.txt"
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 
 
 section .bss
@@ -609,20 +625,33 @@ Mascara:
 	jne Mascara
 
 	mov r15, I0
+<<<<<<< HEAD
 	inc r14
 	inc r14
+=======
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	mov rcx, 0x0
 Begin:
 	mov r8, 0xfc000000
 	and r8, [r15]
 	sar r8, 26; OPCODE
 	
+<<<<<<< HEAD
 	inc rcx
 	dec r14
 	mov rax, 0x0
 	cmp r14, rax
 	je Pexito
 
+=======
+	;VERIFICA SI SE ACABARON LAS INSTRUCCIONES
+	;**************************
+	mov rcx, [r15]
+	mov rax, [I150]
+	cmp rcx, rax
+	je Pexito
+	;***************************
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 
 	;PRINT DATOS
 	;***************************
@@ -664,9 +693,15 @@ Begin:
 	
 
 	;COMPRUEBA SI RT ES $ZERO
+<<<<<<< HEAD
 ;	mov rax, Re0
 ;	cmp r9, rax
 ;	je Error_registro	
+=======
+	mov rax, Re0
+	cmp r9, rax
+	je Error_registro	
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 
 	;RS
 	mov r10,0x3e00000
@@ -781,9 +816,15 @@ Function:
 	add r8, rax
 
 	;VERIFICA SI RD ES $ZERO
+<<<<<<< HEAD
 ;	mov rax, Re0
 ;	cmp r8, rax
 ;	je Error_registro
+=======
+	mov rax, Re0
+	cmp r8, rax
+	je Error_registro
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 
 	;RT
 	mov r9,0x1f0000
@@ -1330,20 +1371,26 @@ JumpLink:
 	mov rsi, instruccion+41
 	mov rdx,4
 	syscall
+<<<<<<< HEAD
 
 	push r13
 	mov r13, instruccion+41
 	write_file r13, 4
 	pop r13	
 	
+=======
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	mov rax,1
 	mov rdi,1
 	mov rsi, inst
 	mov rdx,11
 	syscall
 
+<<<<<<< HEAD
 	write_file inst, 11
 
+=======
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	mov rax, [address]
 	call _printRAX
 
@@ -1365,6 +1412,7 @@ JumpLink:
 	mov r9, I0
 	cmp r9, r11
 	jg Error_address
+<<<<<<< HEAD
 	
 ;----------------------------------------------------
 ;		GUARDADO DE PC+4 EN STACK
@@ -1376,6 +1424,10 @@ JumpLink:
 ;---------------------------------------------------
 	mov r15, r11
 	jmp Begin
+=======
+
+
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 
 Lw:
 	push r11	
@@ -1388,11 +1440,14 @@ Lw:
 	mov rdx,3
 	syscall
 
+<<<<<<< HEAD
 	push r13
 	mov r13, instruccion+50
 	write_file r13, 3
 	pop r13	
 
+=======
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	mov r12, [rt]
 	call _imprimirRegistro	
 	mov r12, [rs]
@@ -1404,6 +1459,7 @@ Lw:
 	pop r10
 	pop r11
 
+<<<<<<< HEAD
 	add r10, r11
 	mov rax, 0x8
 	mul r10
@@ -1413,6 +1469,14 @@ Lw:
 	add r15, 0x8
 	jmp Begin
 
+=======
+
+	add r10, r11 ; rs + inmediate = base + offset
+	mov r13d, [r10]	;Valor de la direccion
+	mov [r9], r13d
+	add r15, 0x8	
+	jmp Begin
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 Nor:
 	push r11	
 	push r10
@@ -1848,11 +1912,14 @@ Sw:
 	mov rdx,3
 	syscall
 
+<<<<<<< HEAD
 	push r13
 	mov r13, instruccion+119
 	write_file r13, 3
 	pop r13	
 
+=======
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	mov r12, [rt]
 	call _imprimirRegistro	
 	mov r12, [rs]
@@ -1864,12 +1931,18 @@ Sw:
 	pop r10
 	pop r11
 
+<<<<<<< HEAD
 	add r10, r11
 	mov rax, 0x8
 	mul r10
 	mov r8, I0; SE DEBE CAMBIAR I0 POR POSICION DE MEMORIA!!!!!
 	add r8, r10
 	mov r8, [r9]; REVISAR ESTA LINEA
+=======
+	add r10, r11 ; Direccion donde se guardara dato
+	mov r13d,[r9] ; Se obtiene el valor en el registro
+	mov [r10], r13d
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	add r15, 0x8
 	jmp Begin
 
@@ -1981,10 +2054,15 @@ stack:
 _negativoStack:
 	mov r10, 0xFFFFFFFFFFFF0000
 	or r10, r11
+<<<<<<< HEAD
 	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
 	add r12, r10 ; Se calcula nueva direccion
 	mov r13, stack0
 
+=======
+	add r12, r10 ; Se calcula nueva direccion
+	mov r13, stack0
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	cmp r13, r12 ; si la direccion stack0 es mayor a dir nueva
 	jg ErrorStack1
 	mov [Re29], r12
@@ -1995,10 +2073,16 @@ _negativoStack:
 _positivoStack:
 	mov r10, 0x000000000000FFFF
 	and r10, r11 ;Mascara para inmediate
+<<<<<<< HEAD
 	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
 	add r12, r10 ; Se calcula nueva direccion
 	mov r13, stack39
 	add r13, 0x8
+=======
+	add r12, r10 ; Se calcula nueva direccion
+	mov r13, stack39
+	add r13, 0x4
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	cmp r12, r13 ; si la direccion nueva es mayor a stack39
 	jg ErrorStack2
 	mov [Re29], r12
@@ -2016,9 +2100,12 @@ ErrorStack1:
 	mov rsi,errorstack1
 	mov rdx,errorstack_tamano1
 	syscall
+<<<<<<< HEAD
 
 	write_file errorstack1, errorstack_tamano1
 
+=======
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 	jmp Exit
 
 ErrorStack2:
@@ -2028,6 +2115,7 @@ ErrorStack2:
 	mov rsi,errorstack2
 	mov rdx,errorstack_tamano2
 	syscall
+<<<<<<< HEAD
 
 	write_file errorstack2, errorstack_tamano2
 
@@ -2036,6 +2124,11 @@ ErrorStack2:
 
 
 
+=======
+	jmp Exit
+
+
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
 Exit:
 	mov rax,1
 	mov rdi,1
@@ -2076,6 +2169,11 @@ C:
 	syscall
 
 _printRAX:
+<<<<<<< HEAD
+=======
+    mov [protect], r10
+    mov r10, 0x0
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
     mov rcx, digitSpace
     mov rbx, 10
     mov [rcx], rbx
@@ -2088,12 +2186,20 @@ _printRAXLoop:
     div rbx
     push rax
     add rdx, 48
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
  
     mov rcx, [digitSpacePos]
     mov [rcx], dl
     inc rcx
     mov [digitSpacePos], rcx
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
     pop rax
     cmp rax, 0
     jne _printRAXLoop
@@ -2107,11 +2213,25 @@ _printRAXLoop2:
     mov rdx, 1
     syscall
 
+<<<<<<< HEAD
     push r12
     mov r12, rcx
     write_file r12, 1
     pop r12
  
+=======
+    mov rax, 0x1
+    cmp r10, rax
+    jne P
+    push r12
+    mov rcx, [digitSpacePos]
+    mov r12, rcx
+    write_file r12, 1
+    pop r12
+P:
+    mov r10, 0x1
+
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
     mov rcx, [digitSpacePos]
     dec rcx
     mov [digitSpacePos], rcx
@@ -2119,6 +2239,10 @@ _printRAXLoop2:
     cmp rcx, digitSpace
     jge _printRAXLoop2
  
+<<<<<<< HEAD
+=======
+    mov r10, [protect]
+>>>>>>> 6152b9e6b0b3e751d7f9b811c13b7765b112cedf
     ret
 
 ;777777777777777777777777777777777777777777777777777777777777777777777
