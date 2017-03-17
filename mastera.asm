@@ -351,8 +351,7 @@ I150 DQ 0xffffffff00000000
 
 
 
-file db "archivo5.txt"
-
+file db "ROM.txt"
 
 
 section .bss
