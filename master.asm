@@ -1198,10 +1198,14 @@ Bne:
 	pop r9
 	pop r10
 	pop r11
-
+pc:
 	add r15, 0x8
 	cmp r9, r10
+brake:
 	jne Signo
+
+pruebaz:
+
 	jmp Begin
 
 Signo:
