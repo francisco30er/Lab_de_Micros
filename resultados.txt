@@ -63,6 +63,7 @@ $v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$
 $v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAsw $t0 $sp AAA*******************************
 $v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAsw $ra $sp AAA*******************************
 $v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAbne $a1 $zero InstruccionAAA*******************************
+<<<<<<< HEAD
 $v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAadd $a1 $zero $t0 *******************************
 $v0 AAA$v1 AAA$a0 AAAAA$a1 -AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAjal InstruccionAAA*******************************
 $v0 AAA$v1 AAA$a0 AAAAA$a1 -AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAaddi $sp $sp -AAA*******************************
@@ -136,4 +137,10 @@ $v0 AAA$v1 AAA$a0 AAAAA$a1 -AAAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AA
 $v0 AAA$v1 AAA$a0 AAAAA$a1 -AAAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAadd $a1 $zero $t0 *******************************
 $v0 AAA$v1 AAA$a0 AAAAA$a1 -AAAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAjal InstruccionAAA*******************************
 $v0 AAA$v1 AAA$a0 AAAAA$a1 -AAAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAaddi $sp $sp -AAAEl espacio de Stack es invalido
+=======
+$v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAadd $v0 $zero $zero *******************************
+$v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAaddi $sp $sp AAA*******************************
+$v0 AAA$v1 AAA$a0 AAAAA$a1 AAA$a2 AAA$a3 AAA$s0 AAA$s1 AAA$s2 AAA$s3 AAA$s4 AAA$s5 AAA$s6 AAA$s7 AAA$sp AAAAAAAAAjr $zero $s0 $zero La instruccion contiene una direccion de memoria no valida
+Ejecucion Fallida
+>>>>>>> f045935d6b01d36e0f1bc6844e3f99804eb15f10
 Presione Enter para finalizarRandall Duran 2013027110, Francisco Elizondo 2013097310, Freddy Salazar 2013116449, Eduardo Zuniga 2013099951
