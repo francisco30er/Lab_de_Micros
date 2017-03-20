@@ -1186,6 +1186,8 @@ Bne:
 	pop r11
 
 	add r15, 0x8
+	mov r9, [r9]
+br:
 	cmp r9, r10
 	jne Signo
 	jmp Begin
