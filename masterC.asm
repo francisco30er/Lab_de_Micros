@@ -1382,7 +1382,7 @@ JumpLink:
 	sub r8, 0x4 ; Le resto 4 para pasar al campo que se pueda usar
 	mov r10, 0x8	
 	add r10, r15
-	mov [r8], r10d ; Guardo el pc+4
+	mov [r8], spor10d ; Guardo el pc+4
 
 ;---------------------------------------------------
 	mov r15, r11
