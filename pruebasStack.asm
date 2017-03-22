@@ -114,6 +114,7 @@ address DQ 0x0
 
 resul db "resultados.txt"
 
+protect DQ 0x0
 
 Re0 DQ 0x0000000000000000
 Re1 DQ 0x0000000000000000
@@ -613,6 +614,9 @@ Max:
 
 First:
 
+;Crea el archivo .text de resultados y lo cierra
+
+
 	;CREATE RESULTADOS
 	mov rax, 2
 	mov rdi, resul
@@ -626,12 +630,12 @@ First:
 	pop rdi
 	syscall
 
-	mov rax, stack39
+	mov rax, stack39 	;Mio
 	add rax, 0x-8
 	mov [Re29], rax
 
 
-
+;imprimir texto
 	mov rax,1
 	mov rdi,1
 	mov rsi,bienvenida
@@ -648,12 +652,17 @@ First:
 	
 	write_file buscando, buscando_tamano
 
+
+;abre la ROM.txt
+
 	;OPEN FILE
 	mov rax, 2
 	mov rdi, file
 	mov rsi, 0
 	mov rdx, 0
 	syscall
+
+;Lee lo que esta en la ROM.txt
 
 	;READ FILE
 	push rax
@@ -668,6 +677,7 @@ First:
 	pop rdi
 	syscall
 
+;Inicializa las varas para el loop de lectura
 
 	mov rax, text
 	mov rbx, 0
@@ -679,6 +689,9 @@ First:
 	mov r15, 0x0
 ;LOOP PARA DETERMINAR Y GUARDAR LAS INSTRUCCIONES EN MEMORIA
 Loop:
+
+; Si es un 1, rota con los 1 de la intruccion (como esta definido)
+
 ;ANALIZA SI EL ASCII ES UNO
 	mov byte cl, [rax]
 	cmp cl, r8b
@@ -689,6 +702,8 @@ Loop:
 	inc rbx
 	inc rax
 	jmp Loop
+
+;Hace shift
 
 ;ANALIZA SI EL ASCII ES CERO
 check_zero:
@@ -724,14 +739,15 @@ check_null:
 ;CARGA LA PRIMERIA INSTRUCCION
 Mascara:
 	
-
-
+; Carga la instruccion nula
+; Compara la primer instruccion y si son iguales brinca a ROM.txt no encontrado
 	mov r8, 0xffffffff00000000
 	mov r9, [I0]
 	cmp r8, r9
 	je No_encontrado
 
-
+; Imprime que lo encontro
+ 
 	;ROM ENCONTRADO
 	mov rax,1
 	mov rdi,1
@@ -762,8 +778,8 @@ Mascara:
 	jne Mascara
 
 	mov r15, I0
-	inc r14
-	inc r14
+	;inc r14
+	;inc r14
 	mov rcx, 0x0
 
 
@@ -1572,23 +1588,6 @@ jal:
 	mov rax, 0x8
 	add rax, r15 ;pc + 4 en rax
 	mov [Re31], rax
-	
-
-;+++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-	
-;----------------------------------------------------
-;		GUARDADO DE PC+4 EN STACK
-;	mov r8, [Re29] ; Obtengo la direccion del stack pointer
-;	sub r8, 0x4 ; Le resto 8 para pasar al campo que se pueda usar
-;	mov r10, 0x8	
-;	add r10, r15
-;	mov r13d, r10d
-;	mov [r8], r13d
-;	mov [Re29], r8
-;---------------------------------------------------
 	mov r15, r11
 	jmp Begin
 
@@ -2340,6 +2339,8 @@ C:
 	syscall
 
 _printRAX:
+    mov [protect], r10
+    mov r10, 0x0
     mov rcx, digitSpace
     mov rbx, 10
     mov [rcx], rbx
@@ -2371,10 +2372,17 @@ _printRAXLoop2:
     mov rdx, 1
     syscall
 
+    mov rax, 0x1
+    cmp r10, rax
+    jne P
     push r12
+    mov rcx, [digitSpacePos]
     mov r12, rcx
     write_file r12, 1
     pop r12
+
+P:
+    mov r10, 0x1
  
     mov rcx, [digitSpacePos]
     dec rcx
@@ -2383,6 +2391,9 @@ _printRAXLoop2:
     cmp rcx, digitSpace
     jge _printRAXLoop2
  
+
+
+    mov r10, [protect]
     ret
 
 ;777777777777777777777777777777777777777777777777777777777777777777777
