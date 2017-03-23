@@ -10,7 +10,7 @@ Al tener las instrucciones listas, se procede a hacer la lectura de estas donde 
 
 Luego de la ejecución de las rutinas de operación, se hace un PC+4, (o el address que corresponda según la instrucción que se ejecutó), esto para pasar a la siguiente instrucción. Cuando se terminan las instrucciones el sistema pasa a una rutina donde se escribe en pantalla el éxito de ejecución y se da la finalización del mismo.
 
-
+	
 ¿Cuáles fueron los principales retos a resolver y cómo se resolvieron?
 
 El lw estaba agarrando un valor de 64 bits, cuando se creía que estaba asignado de 32 bits por lo que los otros 32 bits se estaban llenando con "basura". Para corregir esto, se debugueó los valores que tenían los registros y había uno que no concordaba. Revisando el código se notó un error en el uso de los registros donde se cargaba un valor de 32 bits en memoria a un registros de 64 bits por tanto se agregó una D después del número de registro (Ejemplo r10D) haciendo coincidir el número almacenado en la memoria con el registro.
