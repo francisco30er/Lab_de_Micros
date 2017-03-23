@@ -1468,7 +1468,7 @@ Jump:
 	jg Error_address
 	
 	cmp r15, r11 ;====================================Comparacion para evitar ciclo infinito
-	je cicloinfinito 
+	;je cicloinfinito 
 	mov r15, r11
 	jmp Begin
 
@@ -1487,16 +1487,23 @@ JumpRegister:
 	mov r13, instruccion+46
 	write_file r13, 3
 	pop r13	
-
-
 	mov r12, [rs]
 	call _imprimirRegistro
-
 
 	pop r8
 	pop r9
 	pop r10
 	pop r11
+
+	mov rax, [rs]
+	mov rbx, 0x1F  ; 31
+	cmp rax, rbx
+	jne sigue
+	mov rax, 0x0
+	cmp rax, r10
+	je Salir
+
+sigue:
 
 	mov r8, I0
 
@@ -1782,10 +1789,21 @@ mov r12, [inmediate]
 	jmp Begin
 
 Sll:
-	push r11	
+	
+
+
+
+	;SHAMT
+        mov r11, [r15];
+        mov r13, 0x7c0;
+        and r11, r13; MASCARA
+        sar r11, 6; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DE CORRIMIENTO
+
+
 	push r10
 	push r9
 	push r8
+	push r11
 	mov rax,1
 	mov rdi,1
 	mov rsi, instruccion+92
@@ -1799,21 +1817,18 @@ Sll:
 
 	mov r12, [rd]
 	call _imprimirRegistro
-	mov r12, [rs]
-	call _imprimirRegistro
 	mov r12, [rt]
 	call _imprimirRegistro
-
+	pop r11	
+	mov r12, r11 ; === Imprimir shamt
+	push r11
+	call _inmediate
+	pop r11
 	pop r8
 	pop r9
 	pop r10
-	pop r11
 
-	;SHAMT
-        mov r11, [r15];
-        mov r13, 0x7c0;
-        and r11, r13; MASCARA
-        sar r11, 6; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DE CORRIMIENTO
+
 Loop_sll:
         cmp r11, 0x0
         jz Out_sll
@@ -1827,10 +1842,20 @@ Out_sll:
 
 
 Srl:
-	push r11	
+	
+
+
+
+	;SHAMT
+        mov r11, [r15];
+        mov r13, 0x7c0;
+        and r11, r13; MASCARA
+        sar r11, 6; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DE CORRIMIENTO
+
 	push r10
 	push r9
 	push r8
+	push r11
 	mov rax,1
 	mov rdi,1
 	mov rsi, instruccion+97
@@ -1846,19 +1871,17 @@ Srl:
 	call _imprimirRegistro
 	mov r12, [rs]
 	call _imprimirRegistro
-	mov r12, [rt]
-	call _imprimirRegistro
+	pop r11	
+	mov r12, r11 ; === Imprimir shamt
+	push r11
+	call _inmediate
 
+	pop r11
 	pop r8
 	pop r9
 	pop r10
-	pop r11
 
-	;SHAMT
-        mov r11, [r15];
-        mov r13, 0x7c0;
-        and r11, r13; MASCARA
-        sar r11, 6; CORRIMIENTO A LA DERECHA PARA OBTENER EL NUMERO DE CORRIMIENTO
+
 Loop_srl:
         cmp r11, 0x0
         jz Out_srl
@@ -2768,6 +2791,18 @@ negat:
 
 
 
+Salir:
+	mov rax,1
+	mov rdi,1
+	mov rsi,asteriscos
+	mov rdx,asteriscos_tamano
+	syscall
+
+	write_file asteriscos, asteriscos_tamano
+
+	call datos
+	jmp Exit
+
 _imprimirRegistro:
 
 ;Registro r12 tiene el valor del rt, rd, rs
@@ -3578,121 +3613,5 @@ $t1:
 	mov r12d, [Re9]
 	call _datosInternos
 
-
-push r8
-	push r9
-	push r10
-	push r11
-	push r12
-	push r13
-	push r14
-	push r15
-
-
-
-
-	mov r12d, [stack39]
-	call _datosInternos
-	mov r12, stack39
-	call _datosInternos
-
-	mov r12d, [stack38]
-	call _datosInternos
-	mov r12, stack38
-	call _datosInternos
-
-	mov r12d, [stack37]
-	call _datosInternos
-	mov r12, stack37
-	call _datosInternos
-
-	mov r12d, [stack36]
-	call _datosInternos
-	mov r12, stack36
-	call _datosInternos
-
-	mov r12d, [stack35]
-	call _datosInternos
-	mov r12, stack35
-	call _datosInternos
-
-	mov r12d, [stack34]
-	call _datosInternos
-	mov r12, stack34
-	call _datosInternos
-
-	mov r12d, [stack33]
-	call _datosInternos
-	mov r12, stack33
-	call _datosInternos
-
-	mov r12d, [stack32]
-	call _datosInternos
-	mov r12, stack32
-	call _datosInternos
-
-	mov r12d, [stack31]
-	call _datosInternos
-	mov r12, stack31
-	call _datosInternos
-
-	mov r12d, [stack30]
-	call _datosInternos
-	mov r12, stack30
-	call _datosInternos
-
-	mov r12d, [stack29]
-	call _datosInternos
-	mov r12, stack29
-	call _datosInternos
-
-	mov r12d, [stack28]
-	call _datosInternos
-	mov r12, stack28
-	call _datosInternos
-
-	mov r12d, [stack27]
-	call _datosInternos
-	mov r12, stack27
-	call _datosInternos
-
-	mov r12d, [stack26]
-	call _datosInternos
-	mov r12, stack26
-	call _datosInternos
-
-	mov r12d, [stack25]
-	call _datosInternos
-	mov r12, stack25
-	call _datosInternos
-
-	mov r12d, [stack24]
-	call _datosInternos
-	mov r12, stack24
-	call _datosInternos
-
-	mov r12d, [stack23]
-	call _datosInternos
-	mov r12, stack23
-	call _datosInternos
-
-	mov r12d, [stack0]
-	call _datosInternos
-	mov r12, stack0
-	call _datosInternos
-
-
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-
-
-
-
-
 	ret
+
