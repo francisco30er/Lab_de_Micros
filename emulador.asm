@@ -2470,7 +2470,7 @@ Exit:
 	mov rax, 0xa
 	mov rbx, [letra]
 	cmp rax, rbx
-	je Exit
+	jne Exit
 Fin:
 	mov rax,1
 	mov rdi,1
