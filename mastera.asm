@@ -23,6 +23,20 @@
 
 section .data
 
+ID: db 'ID:',0xa
+consID: equ $-ID 
+
+inteln: db 'Nombre del Modelo:',0xa
+consinteln: equ $-inteln 
+
+family: db 'Familia:',0xa
+consfamily: equ $-family
+
+model: db 'Modelo:',0xa
+consmodel: equ $-family
+
+espacio: db ' ',0xa
+
 cons_hola: db 'Excede el numero de argumentos segmentation fault everywhere!',0xa
 cons_tamano: equ $-cons_hola
 
@@ -453,12 +467,15 @@ M0 DD 0xf1
 
 
 
-file db "archivo5.txt"
+file db "ROM.txt"
 
 
 
 section .bss
-
+intel resb 300
+seller resb 300
+familia  resb 300
+modelo resb 300
 text resb 1200
 letra resb 1
 digitSpace resb 100
@@ -2446,6 +2463,180 @@ Exit:
 	mov r11, [Re3]
 	mov r12, [I17]
 	mov r13, [I18]
+
+    mov rax,1
+  mov rdi,1
+  mov rsi,ID
+  mov rdx,consID
+  syscall 
+
+
+
+
+
+  mov eax,0x0
+  cpuid
+  mov [seller],ebx
+  mov [seller+4],edx
+  mov [seller+8],ecx
+
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, seller
+  mov rdx, 100
+  syscall
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+
+
+;----------------------------Nombre del Modelo--------------------------------
+
+
+mov rax,1
+mov rdi,0
+mov rsi,inteln
+mov rdx,consinteln
+syscall
+
+mov eax,0x80000002
+cpuid
+mov [intel],eax
+mov [intel+4],ebx
+mov [intel+8],ecx
+mov [intel+12],edx
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, intel
+  mov rdx, 100
+  syscall
+
+
+
+mov eax,0x80000003
+cpuid
+mov [intel],eax
+mov [intel+4],ebx
+mov [intel+8],ecx
+mov [intel+12],edx
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, intel
+  mov rdx, 100
+  syscall
+
+
+mov eax,0x80000004
+cpuid
+mov [intel],eax
+mov [intel+4],ebx
+mov [intel+8],ecx
+mov [intel+12],edx
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, intel
+  mov rdx, 100
+  syscall
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+ 
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+
+
+;-------------------------------------Familia-------------------------------
+
+  mov rax,1
+  mov rdi,1
+  mov rsi,family
+  mov rdx,consfamily
+  syscall  
+
+  mov eax,1
+  cpuid
+  sar eax,8
+  and eax,15
+  add eax, 48
+  mov [familia],eax
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, familia
+  mov rdx, 100
+  syscall
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+  
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+
+;------------------------------------Modelo-------------------------------
+  mov rax,1
+  mov rdi,1
+  mov rsi,model
+  mov rdx,7
+  syscall
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+
+  mov eax,1
+  cpuid
+  sar eax,4
+  and eax,15
+  
+  mov r8d,eax
+
+  mov eax,1
+  cpuid
+  sar eax,16
+  and eax,15
+  
+  sal eax, 4
+  add eax,r8d
+  mov [modelo],eax
+
+  mov r12,[modelo]
+  call _inmediate
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, espacio
+  mov rdx, 2
+  syscall
+
+
+
 C:
 	mov rax, 60
 	mov rdi, 0
