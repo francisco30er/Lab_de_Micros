@@ -64,9 +64,11 @@ finalizar_tamano: equ $-finalizar
 
 
 
+Noffset: db 'La direccion que se desea accesar no esta disponible por el stack', 0xa
+NoffsetT: equ $-finalizar
 
-
-
+AD: db 'El address debe ser un numero positivo', 0xa
+ADT: equ $-AD
 
 ;-------------------------------------------------------------------
 
@@ -80,13 +82,13 @@ errorstack_tamano2: equ $-errorstack2
 
 inst: db 'Instruccion'
 
-
-
+infinito: db 'El address del jump genera un ciclo infinito hacia el mismo', 0xa
+infinitoT: equ $-infinito
 
 ;-------------------------------------------------------------------
 
-
-
+errorMemo: db 'El espacio de memoria de datos no es valido', 0xa
+errorMemoT: equ $-errorMemo
 
 
 
@@ -114,39 +116,40 @@ address DQ 0x0
 
 resul db "resultados.txt"
 
+protect DQ 0x0
 
 Re0 DQ 0x0000000000000000
-Re1 DQ 0x0000000000000001
-Re2 DQ 0x0000000000000001
+Re1 DQ 0x0000000000000000
+Re2 DQ 0x0000000000000000
 Re3 DQ 0x0000000000000000
-Re4 DQ 0x0000000000000010
+Re4 DQ 0x0000000000000000
 Re5 DQ 0x0000000000000000
 Re6 DQ 0x0000000000000000
 Re7 DQ 0x0000000000000000
 Re8 DQ 0x0000000000000000
-Re9 DQ 0x0000000000000001
+Re9 DQ 0x0000000000000000
 Re10 DQ 0x0000000000000000
-Re11 DQ 0x0000000000000010
+Re11 DQ 0x0000000000000000
 Re12 DQ 0x0000000000000000
 Re13 DQ 0x0000000000000000
-Re14 DQ 0x0000000000000010
+Re14 DQ 0x0000000000000000
 Re15 DQ 0x0000000000000000
 Re16 DQ 0x0000000000000000
 Re17 DQ 0x0000000000000000
-Re18 DQ 0x0000000000000001
-Re19 DQ 0x0000000000000001
+Re18 DQ 0x0000000000000000
+Re19 DQ 0x0000000000000000
 Re20 DQ 0x0000000000000000
-Re21 DQ 0x0000000000000001
-Re22 DQ 0x0000000000000001
+Re21 DQ 0x0000000000000000
+Re22 DQ 0x0000000000000000
 Re23 DQ 0x0000000000000000
-Re24 DQ 0x0000000000000010
+Re24 DQ 0x0000000000000000
 Re25 DQ 0x0000000000000000
 Re26 DQ 0x0000000000000000
 Re27 DQ 0x0000000000000000
-Re28 DQ 0x0000000000000001
-Re29 DQ 0x0000000000000001
+Re28 DQ 0x0000000000000000
+Re29 DQ 0x000000000000000f
 Re30 DQ 0x0000000000000000
-Re31 DQ 0x0000000000000001
+Re31 DQ 0x0000000000000000
 
 
 I0 DQ 0xffffffff00000000
@@ -301,56 +304,156 @@ I148 DQ 0xffffffff00000000
 I149 DQ 0xffffffff00000000
 
 
+;--------------------------------memoria------------------------------
+
+M100 DD 0xf1
+M99 DD 0xf1
+M98 DD 0xf1
+M97 DD 0xf1
+M96 DD 0xf1
+M95 DD 0xf1
+M94 DD 0xf1
+M93 DD 0xf1
+M92 DD 0xf1
+M91 DD 0xf1
+M90 DD 0xf1
+M89 DD 0xf1
+M88 DD 0xf1
+M87 DD 0xf1
+M86 DD 0xf1
+M85 DD 0xf1
+M84 DD 0xf1
+M83 DD 0xf1
+M82 DD 0xf1
+M81 DD 0xf1
+M80 DD 0xf1
+M79 DD 0xf1
+M78 DD 0xf1
+M77 DD 0xf1
+M76 DD 0xf1
+M75 DD 0xf1
+M74 DD 0xf1
+M73 DD 0xf1
+M72 DD 0xf1
+M71 DD 0xf1
+M70 DD 0xf1
+M69 DD 0xf1
+M68 DD 0xf1
+M67 DD 0xf1
+M66 DD 0xf1
+M65 DD 0xf1
+M64 DD 0xf1
+M63 DD 0xf1
+M62 DD 0xf1
+M61 DD 0xf1
+M60 DD 0xf1
+M59 DD 0xf1
+M58 DD 0xf1
+M57 DD 0xf1
+M56 DD 0xf1
+M55 DD 0x8
+M54 DD 0x7
+M53 DD 0x6
+M52 DD 0x5
+M51 DD 0x4
+M50 DD 0x3
+M49 DD 0x2
+M48 DD 0x1
+M47 DD 0xf1
+M46 DD 0xf1
+M45 DD 0xf1
+M44 DD 0xf1
+M43 DD 0xf1
+M42 DD 0xf1
+M41 DD 0xf1
+M40 DD 0xf1
+M39 DD 0xf1
+M38 DD 0xf1
+M37 DD 0xD
+M36 DD 0xf1
+M35 DD 0xf1
+M34 DD 0xf1
+M33 DD 0xf1
+M32 DD 0xf1
+M31 DD 0xf1
+M30 DD 0xf1
+M29 DD 0xf1
+M28 DD 0xf1
+M27 DD 0xf1
+M26 DD 0xf1
+M25 DD 0xf1
+M24 DD 0xf1
+M23 DD 0xf1
+M22 DD 0xf1
+M21 DD 0xf1
+M20 DD 0xf1
+M19 DD 0xf1
+M18 DD 0xf1
+M17 DD 0xf1
+M16 DD 0xf1
+M15 DD 0xf1
+M14 DD 0xf1
+M13 DD 0xf1
+M12 DD 0xf1
+M11 DD 0xf1
+M10 DD 0xf1
+M9 DD 0xf1
+M8 DD 0xf1
+M7 DD 0xf1
+M6 DD 0xf1
+M5 DD 0xf1
+M4 DD 0xf1
+M3 DD 0xf1
+M2 DD 0xf1
+M1 DD 0xf1
+M0 DD 0xf1
 ;--------------------- stack ---------------------------------------
 
-
-	Contador DQ 0x8	
-
-	stack0 DQ 9h 
-	stack1 DQ 8h
-	stack2 DQ 7h
-	stack3 DQ 6h
-	stack4 DQ 5h
-	stack5 DQ 4h
-	stack6 DQ 3h
-	stack7 DQ 2h
-	stack8 DQ 1h
-	stack9 DQ 0h
-	stack10 DQ 9h 
-	stack11 DQ 8h
-	stack12 DQ 7h
-	stack13 DQ 6h
-	stack14 DQ 5h
-	stack15 DQ 4h
-	stack16 DQ 3h
-	stack17 DQ 2h
-	stack18 DQ 1h
-	stack19 DQ 0h
-	stack20 DQ 9h 
-	stack21 DQ 8h
-	stack22 DQ 7h
-	stack23 DQ 6h
-	stack24 DQ 5h
-	stack25 DQ 4h
-	stack26 DQ 3h
-	stack27 DQ 2h
-	stack28 DQ 1h
-	stack29 DQ 0h
-	stack30 DQ 9h 
-	stack31 DQ 8h
-	stack32 DQ 7h
-	stack33 DQ 6h
-	stack34 DQ 5h
-	stack35 DQ 4h
-	stack36 DQ 3h
-	stack37 DQ 2h
-	stack38 DQ 1h
-	stack39 DQ 0h
+	stack0 DD 0xf 
+	stack1 DD 0xf
+	stack2 DD 0xf
+	stack3 DD 0xf
+	stack4 DD 0xf
+	stack5 DD 0xf
+	stack6 DD 0xf
+	stack7 DD 0xf
+	stack8 DD 0xf
+	stack9 DD 0xf
+	stack10 DD 0xf 
+	stack11 DD 0xf
+	stack12 DD 0xf
+	stack13 DD 0xf
+	stack14 DD 0xf
+	stack15 DD 0xf
+	stack16 DD 0xf
+	stack17 DD 0xf
+	stack18 DD 0xf
+	stack19 DD 0xf
+	stack20 DD 0xf 
+	stack21 DD 0xf
+	stack22 DD 0xf
+	stack23 DD 0xf
+	stack24 DD 0xf
+	stack25 DD 0xf
+	stack26 DD 0xf
+	stack27 DD 0xf
+	stack28 DD 0xf
+	stack29 DD 0xf
+	stack30 DD 0xf 
+	stack31 DD 0xf
+	stack32 DD 0xf
+	stack33 DD 0xf
+	stack34 DD 0xf
+	stack35 DD 0xf
+	stack36 DD 0xf
+	stack37 DD 0xf
+	stack38 DD 0xf
+	stack39 DD 0xf
 
 
 
 
-file db "ROM.txt"
+file db "archivo5.txt"
 
 
 
@@ -463,6 +566,9 @@ Max:
 
 First:
 
+;Crea el archivo .text de resultados y lo cierra
+
+
 	;CREATE RESULTADOS
 	mov rax, 2
 	mov rdi, resul
@@ -476,12 +582,12 @@ First:
 	pop rdi
 	syscall
 
-	mov rax, stack39
+	mov rax, stack39 	;Mio
 	add rax, 0x-8
 	mov [Re29], rax
 
 
-
+;imprimir texto
 	mov rax,1
 	mov rdi,1
 	mov rsi,bienvenida
@@ -498,12 +604,17 @@ First:
 	
 	write_file buscando, buscando_tamano
 
+
+;abre la ROM.txt
+
 	;OPEN FILE
 	mov rax, 2
 	mov rdi, file
 	mov rsi, 0
 	mov rdx, 0
 	syscall
+
+;Lee lo que esta en la ROM.txt
 
 	;READ FILE
 	push rax
@@ -518,6 +629,7 @@ First:
 	pop rdi
 	syscall
 
+;Inicializa las varas para el loop de lectura
 
 	mov rax, text
 	mov rbx, 0
@@ -529,6 +641,9 @@ First:
 	mov r15, 0x0
 ;LOOP PARA DETERMINAR Y GUARDAR LAS INSTRUCCIONES EN MEMORIA
 Loop:
+
+; Si es un 1, rota con los 1 de la intruccion (como esta definido)
+
 ;ANALIZA SI EL ASCII ES UNO
 	mov byte cl, [rax]
 	cmp cl, r8b
@@ -539,6 +654,8 @@ Loop:
 	inc rbx
 	inc rax
 	jmp Loop
+
+;Hace shift
 
 ;ANALIZA SI EL ASCII ES CERO
 check_zero:
@@ -573,12 +690,16 @@ check_null:
 
 ;CARGA LA PRIMERIA INSTRUCCION
 Mascara:
+	
+; Carga la instruccion nula
+; Compara la primer instruccion y si son iguales brinca a ROM.txt no encontrado
 	mov r8, 0xffffffff00000000
 	mov r9, [I0]
 	cmp r8, r9
 	je No_encontrado
 
-
+; Imprime que lo encontro
+ 
 	;ROM ENCONTRADO
 	mov rax,1
 	mov rdi,1
@@ -609,17 +730,59 @@ Mascara:
 	jne Mascara
 
 	mov r15, I0
-	inc r14
-	inc r14
+	;inc r14
+	;inc r14
 	mov rcx, 0x0
+
+
+
+
+
+
+;5555555555555555555555555555555555555555555555555555555555
+	push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+
+	mov rax, stack39 ;No se borra 55554443322110000000000000000
+	add rax, 0x4
+	mov [Re29], rax
+
+	mov r12, [Re29]
+	call _datosInternos
+
+	mov r12, 0xffffffff00000000
+	mov [Re31], r12
+
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
+	pop r9
+	pop r8
+;55555555555555555555555555555555555555555555555555555555555555555
+
 Begin:
+
+
+
+;	mov rax, [r15]	
+;	add rax, 0x8
+;	mov [Re31], rax
+
+
 	mov r8, 0xfc000000
 	and r8, [r15]
 	sar r8, 26; OPCODE
 	
-	mov rax, 0xffffffff00000000
-	cmp r15, rax
-	je Pexito
+	
 
 
 	;PRINT DATOS
@@ -636,6 +799,13 @@ Begin:
 
 	
 	;***************************
+
+	mov rax, 0xffffffff00000000
+	mov rbx,[r15]
+	cmp rbx, rax
+	je Pexito
+
+
 
 	mov r13, 0x0; OPCODE CERO (INSTRUCCION TIPO R)
 	cmp r8, r13
@@ -970,6 +1140,7 @@ Addi:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+mov r12, [inmediate]
 	call _inmediate
 
 
@@ -1100,6 +1271,7 @@ Andi:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1137,6 +1309,7 @@ Beq:
 	mov rsi, inst
 	mov rdx,11
 	syscall
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1177,7 +1350,7 @@ Bne:
 	syscall
 
 	write_file inst, 11
-
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1212,7 +1385,7 @@ Positivo:
 	shl r11, 3
 	add r15, r11
 	mov r8, I0
-	mov r9, 0x96; 150 instrucciones
+	mov r9, r14
 	shl r9, 3
 	add r8, r9
 	cmp r15, r8
@@ -1247,11 +1420,8 @@ Jump:
 
 	write_file inst, 11
 
-	mov rax, [address]
-	call _printRAX
-
-
-
+	mov r12, [address]
+	call _inmediate
 
 	pop r8
 	pop r9
@@ -1259,19 +1429,29 @@ Jump:
 	pop r11
 
 
+; Comprobacion address positiva
+
+	mov rax, 1000000
+	and rax, r11
+	mov rbx, 0x0	
+	cmp rax, rbx
+	jne addressNegativa
 
 	shl r11, 3
 	mov r8, I0
 	add r11, r8
 
-	mov r9, 0x96; 150 instrucciones
+	mov r9, r14 ; Comprobacion direccion
 	shl r9, 3
 	add r8, r9
 	cmp r11, r8
-	jge Error_address
+	je Error_address
 	mov r9, I0
 	cmp r9, r11
 	jg Error_address
+	
+	cmp r15, r11 ;====================================Comparacion para evitar ciclo infinito
+	je cicloinfinito 
 	mov r15, r11
 	jmp Begin
 
@@ -1291,12 +1471,10 @@ JumpRegister:
 	write_file r13, 3
 	pop r13	
 
-	mov r12, [rd]
-	call _imprimirRegistro
+
 	mov r12, [rs]
 	call _imprimirRegistro
-	mov r12, [rt]
-	call _imprimirRegistro
+
 
 	pop r8
 	pop r9
@@ -1304,20 +1482,26 @@ JumpRegister:
 	pop r11
 
 	mov r8, I0
-	mov r9, 0x96; 150 instrucciones
+
+	mov r9, r14
 	shl r9, 3
 	add r8, r9
 	cmp r10, r8
-	jge Error_address
+	je Error_address
 	mov r9, I0
 	cmp r9, r10
 	jg Error_address
 	mov r15, r10
+jr:
 	jmp Begin
 
 JumpLink:
-		
-	mov r11, [R15]
+	mov rax, r15
+	add rax, 0x8
+	mov rbx, I0
+jal:
+	mov [Re31], rax	
+	mov r11, [r15]
 	mov rax, 0x03FFFFFF
 	and r11, rax
 	mov [address], r11 
@@ -1344,8 +1528,8 @@ JumpLink:
 
 	write_file inst, 11
 
-	mov rax, [address]
-	call _printRAX
+	mov r12, [address]
+	call _inmediate
 
 
 	pop r8
@@ -1353,27 +1537,34 @@ JumpLink:
 	pop r10
 	pop r11
 
+	mov rax, 1000000
+	and rax, r11
+	mov rbx, 0x0	
+	cmp rax, rbx
+	jne addressNegativa
 
 	shl r11, 3
 	mov r8, I0
 	add r11, r8
-	mov r9, 0x96; 150 instrucciones
+	
+	mov r9, r14
 	shl r9, 3
+
+;	mov r9, 0x96; 150 instrucciones
+;	shl r9, 3
+
 	add r8, r9
 	cmp r11, r8
-	jge Error_address
+	jg Error_address
 	mov r9, I0
 	cmp r9, r11
 	jg Error_address
-	
-;----------------------------------------------------
-;		GUARDADO DE PC+4 EN STACK
-	mov r8, [Re29] ; Obtengo la direccion del stack pointer
-	sub r8, 0x8 ; Le resto 8 para pasar al campo que se pueda usar
-	mov r10, 0x8	
-	add r10, r15
-	mov [r8], r10
-;---------------------------------------------------
+
+;+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+	mov rax, 0x8
+	add rax, r15 ;pc + 4 en rax
+	mov [Re31], rax
 	mov r15, r11
 	jmp Begin
 
@@ -1397,6 +1588,7 @@ Lw:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1404,15 +1596,75 @@ Lw:
 	pop r10
 	pop r11
 
-	add r10, r11
-	mov rax, 0x8
-	mul r10
-	mov r8, I0; SE DEBE CAMBIAR I0 POR POSICION DE MEMORIA!!!!
-	add r8, rax
-	mov [r9], r8; REVISAR ESTA LINEA
-	add r15, 0x8
-	jmp Begin
+	mov r13, 0x1D ; 29 en hexadecimal
+	mov r12, [rs] ; Obtiene el numero de registro
+	cmp r12, r13 ; Compara el registro rs a ver si es $sp
+	jne espacioMemoLW ; si son diferentes, va a memoria
 
+
+;----------------------------------------------------- Stack	
+; Caso para cuando es $sp (el stack)
+
+pruebalw:
+	mov rax, 0x8000
+	and rax, r11
+	mov rbx, 0x0
+	cmp rax, rbx
+	jne Error_valido
+
+	add r10, r11 ; sumamos el offset a base (asumiendo positivo)
+	mov rax, stack39
+	cmp r10, stack39
+	jg ErrorStack2
+	mov rax, stack0
+	cmp rax, r10
+	jg ErrorStack1
+	
+	mov r13d, [r10]	; sacamos el dato de la nueva address
+	mov [r9], r13d ; se guarda el valor del address en rt
+	mov rax, [r9]
+pruebalw2:
+	
+	add r15, 0x8
+	jmp Begin 
+	
+;----------------------------------------------------- Memoria	
+espacioMemoLW:
+
+	mov rax, 0x8000
+	and rax, r11
+	mov rbx, 0x0
+	cmp rax, rbx
+	je signoLW 
+	mov rax, 0xffffffffffff0000
+	or r11, rax  ; Inmediate negativo
+
+signoLW:
+
+	mov r13, M0 ; tomo el valor inicial de memoria
+	add r10d, r11d	
+
+prlw:
+	sub r13d, r10d ; offset + base ---> new address
+
+; Se hace sub ya que para subir en memoria (pasar de 0 a 50 por ejemplo) se ocupa restar la direccion ya que la direccion de M0 es la mayor.
+prlw1:
+
+;========
+	mov rax, M0
+	cmp r13, rax
+	jg ErrorMemo
+pruebaerror:	
+	mov rax, M100
+	cmp rax, r13
+	jg ErrorMemo
+;========
+	mov r10d, [r13] ; se obtiene el valor de la address
+	mov [r9], r10d ; se guarda el valor del address en rt	
+prlw2:	
+add r15, 0x8
+	jmp Begin 
+;-----------------------------------------------------
 Nor:
 	push r11	
 	push r10
@@ -1499,6 +1751,7 @@ Ori:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1705,6 +1958,7 @@ Slti:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1744,6 +1998,7 @@ Sltiu:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1857,6 +2112,7 @@ Sw:
 	call _imprimirRegistro	
 	mov r12, [rs]
 	call _imprimirRegistro
+mov r12, [inmediate]
 	call _inmediate
 
 	pop r8
@@ -1864,15 +2120,83 @@ Sw:
 	pop r10
 	pop r11
 
-	add r10, r11
-	mov rax, 0x8
-	mul r10
-	mov r8, I0; SE DEBE CAMBIAR I0 POR POSICION DE MEMORIA!!!!!
-	add r8, r10
-	mov r8, [r9]; REVISAR ESTA LINEA
-	add r15, 0x8
-	jmp Begin
+	mov r13, 0x1D ; 29 en hexadecimal
+	mov r12, [rs] ; Obtiene el numero de registro
+	cmp r12, r13 ; Compara el registro rs a ver si es $sp
+	jne espacioMemoSW ; si son diferentes, va a memoria
 
+
+;-----------------------------------------------------	Stack
+; Caso para cuando es $sp (el stack)
+pruebasw:
+
+	mov rax, 0x8000
+	and rax, r11
+	mov rbx, 0x0
+	cmp rax, rbx
+	jne Error_valido
+
+	
+
+	add r10, r11 ; sumamos el offset a base (asumiendo positivo)
+	mov rax, stack39
+	cmp r10, stack39
+	jg ErrorStack2
+	
+	mov rax, stack0
+	cmp rax, r10
+	jg ErrorStack1
+	
+	mov r13d, [r9]
+
+pruebasw2:
+	mov [r10], r13d ; se guarda el valor de rt en el address
+	add r15, 0x8
+	jmp Begin 
+	
+	
+;----------------------------------------------------- Memoria
+espacioMemoSW:
+
+	mov rax, 0x8000
+	and rax, r11
+	mov rbx, 0x0
+	cmp rax, rbx
+	je signoSW 
+	mov rax, 0xffffffffffff0000
+	or r11, rax  ; Inmediate negativo
+
+signoSW:
+	mov r13, M0 ; tomo el valor inicial de memoria
+	add r10, r11	
+prsw:
+	sub r13, r10 ; offset + base ---> new address
+
+; Se hace sub ya que para subir en memoria (pasar de 0 a 50 por ejemplo) se ocupa restar la direccion ya que la direccion de M0 es la mayor.
+prsw1:
+
+
+;=====
+
+	mov rax, M0
+	cmp r13, rax
+	jg ErrorMemo
+	
+	mov rax, M100
+	cmp rax, r13
+	jg ErrorMemo
+
+
+
+;=====
+
+	mov r10d, [r9] ; se obtiene el valor de la address
+	mov [r13], r10d ; se guarda el valor de rt en address	
+prsw2:	
+add r15, 0x8
+	jmp Begin 	
+
+;-----------------------------------------------------
 Mul:
 	push r11	
 	push r10
@@ -1906,6 +2230,60 @@ Mul:
 	mov [r8], rax
 	add r15, 0x8
 	jmp Begin
+
+
+addressNegativa:
+	;ERROR DE sw y lw ingresando a stack no "abierto"
+	mov rax,1
+	mov rdi,1
+	mov rsi,AD
+	mov rdx,39
+	syscall
+
+	write_file AD, ADT	
+
+	jmp Perror	
+
+cicloinfinito:
+	;ERROR donde j salta a si mismo provocando ciclo infinito
+	mov rax,1
+	mov rdi,1
+	mov rsi,infinito
+	mov rdx,60
+	syscall
+
+	write_file infinito, infinitoT	
+
+	jmp Perror	
+
+
+
+
+Error_valido:
+	;ERROR DE sw y lw ingresando a stack no "abierto"
+	mov rax,1
+	mov rdi,1
+	mov rsi,Noffset
+	mov rdx,67
+	syscall
+
+	write_file Noffset, NoffsetT	
+
+	jmp Perror
+
+ErrorMemo:
+	;ERROR DE ADDRESS para memoria en lw y sw
+	mov rax,1
+	mov rdi,1
+	mov rsi,errorMemo
+	mov rdx,44
+	syscall
+
+	write_file errorMemo, errorMemoT	
+
+	jmp Perror
+
+
 
 Error_address:
 	;ERROR DE ADDRESS
@@ -1980,31 +2358,29 @@ stack:
 
 _negativoStack:
 	mov r10, 0xFFFFFFFFFFFF0000
+pruebas1:	
 	or r10, r11
-	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
-	add r12, r10 ; Se calcula nueva direccion
+	add r12, r10 ; Se calcula nueva direccion $sp
+pruebas:
 	mov r13, stack0
-
+	;mov rax, stack39
 	cmp r13, r12 ; si la direccion stack0 es mayor a dir nueva
 	jg ErrorStack1
-	mov [Re29], r12
+	mov [Re29], r12d
 	add r15, 0x8
+pruebas2:
 	jmp Begin
 
 
 _positivoStack:
-	mov r10, 0x000000000000FFFF
-	and r10, r11 ;Mascara para inmediate
-	shl r10, 1 ; (Valor/4)*8=Valor*2 = Corrimiento a 1
-	add r12, r10 ; Se calcula nueva direccion
+	add r12, r11 ; Se calcula nueva direccion
 	mov r13, stack39
-	add r13, 0x8
+	add r13, 0x4
 	cmp r12, r13 ; si la direccion nueva es mayor a stack39
 	jg ErrorStack2
-	mov [Re29], r12
+	mov [Re29], r12d
 	add r15, 0x8
 	jmp Begin
-
 ;----------------------------------------------------------------
 
 ;----------------------------------------------------------------
@@ -2076,6 +2452,8 @@ C:
 	syscall
 
 _printRAX:
+    mov [protect], r10
+    mov r10, 0x0
     mov rcx, digitSpace
     mov rbx, 10
     mov [rcx], rbx
@@ -2107,10 +2485,17 @@ _printRAXLoop2:
     mov rdx, 1
     syscall
 
+    mov rax, 0x1
+    cmp r10, rax
+    jne P
     push r12
+    mov rcx, [digitSpacePos]
     mov r12, rcx
     write_file r12, 1
     pop r12
+
+P:
+    mov r10, 0x1
  
     mov rcx, [digitSpacePos]
     dec rcx
@@ -2119,12 +2504,15 @@ _printRAXLoop2:
     cmp rcx, digitSpace
     jge _printRAXLoop2
  
+
+
+    mov r10, [protect]
     ret
 
 ;777777777777777777777777777777777777777777777777777777777777777777777
 
 _inmediate:
-	mov r12, [inmediate]
+	
 	mov r10, 0x8000
 	and r10, r12
 	mov r13, 0x0	
@@ -2965,5 +3353,155 @@ datos:
 
 	mov r12, [Re29]
 	call _datosInternos
+
+
+$t0:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+42
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+42
+	write_file r13, 4
+	pop r13
+
+	mov r12d, [Re8]
+	call _datosInternos
+
+
+$t1:
+	mov rax,1
+	mov rdi,1
+	mov rsi,registros+47
+	mov rdx,4
+	syscall
+
+	push r13
+	mov r13, registros+47
+	write_file r13, 4
+	pop r13
+
+
+	mov r12d, [Re9]
+	call _datosInternos
+
+
+push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+
+
+
+
+	mov r12d, [stack39]
+	call _datosInternos
+	mov r12, stack39
+	call _datosInternos
+
+	mov r12d, [stack38]
+	call _datosInternos
+	mov r12, stack38
+	call _datosInternos
+
+	mov r12d, [stack37]
+	call _datosInternos
+	mov r12, stack37
+	call _datosInternos
+
+	mov r12d, [stack36]
+	call _datosInternos
+	mov r12, stack36
+	call _datosInternos
+
+	mov r12d, [stack35]
+	call _datosInternos
+	mov r12, stack35
+	call _datosInternos
+
+	mov r12d, [stack34]
+	call _datosInternos
+	mov r12, stack34
+	call _datosInternos
+
+	mov r12d, [stack33]
+	call _datosInternos
+	mov r12, stack33
+	call _datosInternos
+
+	mov r12d, [stack32]
+	call _datosInternos
+	mov r12, stack32
+	call _datosInternos
+
+	mov r12d, [stack31]
+	call _datosInternos
+	mov r12, stack31
+	call _datosInternos
+
+	mov r12d, [stack30]
+	call _datosInternos
+	mov r12, stack30
+	call _datosInternos
+
+	mov r12d, [stack29]
+	call _datosInternos
+	mov r12, stack29
+	call _datosInternos
+
+	mov r12d, [stack28]
+	call _datosInternos
+	mov r12, stack28
+	call _datosInternos
+
+	mov r12d, [stack27]
+	call _datosInternos
+	mov r12, stack27
+	call _datosInternos
+
+	mov r12d, [stack26]
+	call _datosInternos
+	mov r12, stack26
+	call _datosInternos
+
+	mov r12d, [stack25]
+	call _datosInternos
+	mov r12, stack25
+	call _datosInternos
+
+	mov r12d, [stack24]
+	call _datosInternos
+	mov r12, stack24
+	call _datosInternos
+
+	mov r12d, [stack23]
+	call _datosInternos
+	mov r12, stack23
+	call _datosInternos
+
+	mov r12d, [stack0]
+	call _datosInternos
+	mov r12, stack0
+	call _datosInternos
+
+
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
+	pop r9
+	pop r8
+
+
+
+
 
 	ret
