@@ -2494,6 +2494,7 @@ Fin:
   syscall 
 
 
+write_file ID, 3
 
 
 
@@ -2510,11 +2511,16 @@ Fin:
   mov rdx, 100
   syscall
 
+write_file seller, 12
+
+
   mov rax, 1
   mov rdi, 1
   mov rsi, espacio
   mov rdx, 2
   syscall
+
+write_file espacio, 2
 
   mov rax, 1
   mov rdi, 1
@@ -2535,6 +2541,9 @@ mov rdi,0
 mov rsi,inteln
 mov rdx,consinteln
 syscall
+
+write_file inteln, consinteln
+
 
 mov eax,0x80000002
 cpuid
