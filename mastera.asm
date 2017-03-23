@@ -576,7 +576,7 @@ Max:
 	mov rsi,cons_hola
 	mov rdx,cons_tamano
 	syscall
-	jmp Perror  	
+	jmp Fin 	
       
 	
 	
@@ -2471,7 +2471,7 @@ Exit:
 	mov rbx, [letra]
 	cmp rax, rbx
 	je Exit
-
+Fin:
 	mov rax,1
 	mov rdi,1
 	mov rsi,nombres
@@ -2487,7 +2487,7 @@ Exit:
 	mov r12, [I17]
 	mov r13, [I18]
 
-    mov rax,1
+  mov rax,1
   mov rdi,1
   mov rsi,ID
   mov rdx,consID
@@ -3614,4 +3614,3 @@ $t1:
 	call _datosInternos
 
 	ret
-
